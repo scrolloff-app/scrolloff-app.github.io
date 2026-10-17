@@ -5,6 +5,8 @@
   const $$ = (s, el = document) => [...el.querySelectorAll(s)];
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   document.documentElement.classList.remove('no-js');
+  // Amb "reduir moviment" el vídeo de fons queda aturat al pòster.
+  if (reduce) document.querySelectorAll('video[autoplay]').forEach(v => { v.removeAttribute('autoplay'); v.pause(); });
 
   // ---------- Idioma ----------
   const LANGS = ['ca', 'es', 'en'];
@@ -260,7 +262,7 @@
     if (!$('#join-email').checkValidity()) { $('#join-email').reportValidity(); return; }
     const subject = encodeURIComponent(fill(t('mail.subject'), { os }));
     const body = encodeURIComponent(fill(t('mail.body'), { os, email }));
-    location.href = `mailto:danielmeller@gmail.com?subject=${subject}&body=${body}`;
+    location.href = `mailto:danielmeller@gmail.com,david.meller.e@gmail.com?subject=${subject}&body=${body}`;
   });
 
   // ---------- La demo puja una mica en fer scroll ----------
