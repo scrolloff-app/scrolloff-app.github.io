@@ -328,7 +328,8 @@ button { cursor: pointer; }
 .dialog-title { font-size: 22px; font-weight: 800; letter-spacing: -0.01em; margin-bottom: 6px; }
 .dialog label { font-size: 13px; font-weight: 600; color: #444; }
 .dialog input { height: 50px; border-radius: 12px; border: 1px solid #D6D2C6; background: #fff; padding: 0 14px; color: #151515; font-size: 17px; transition: border-color .2s; }
-.dialog input:focus { border-color: #151515; outline: none; }
+.dialog input:focus { border-color: #151515; }
+.dialog input:focus-visible { outline: 3px solid var(--accent-deep); outline-offset: 2px; }
 .seg-light { background: #ECE8DC; }
 .seg-light button { color: #555; }
 .seg-light button[aria-checked="true"] { background: #151515; color: #fff; }

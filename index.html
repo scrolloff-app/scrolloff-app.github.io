@@ -18,7 +18,7 @@
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-<a class="skip" href="#main">Salta al contingut</a>
+<a class="skip" href="#main" data-i18n="skip">Salta al contingut</a>
 
 <header class="top">
   <a class="wordmark" href="#" aria-label="ScrollOff">
@@ -208,8 +208,8 @@
           <button type="button" role="radio" aria-checked="false" data-v="3">3 h</button>
         </div>
       </div>
-      <div class="ctl"><span data-i18n="nudge.on">Avisos</span>
-        <button type="button" class="toggle" role="switch" aria-checked="true" data-nudge-toggle><span></span></button>
+      <div class="ctl"><span id="nudge-on-label" data-i18n="nudge.on">Avisos</span>
+        <button type="button" class="toggle" role="switch" aria-checked="true" aria-labelledby="nudge-on-label" data-nudge-toggle><span></span></button>
       </div>
       <div class="ctl"><span data-i18n="nudge.next">Una altra frase</span>
         <button type="button" class="round" data-nudge-next aria-label="Una altra frase">↻</button>
