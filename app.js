@@ -358,17 +358,21 @@
   }
 
   // --- 2. La frase s'il·lumina paraula a paraula (secció fixada) ---
-  let scrubTween = null;
-  function buildScrub() {
-    if (scrubTween) { scrubTween.scrollTrigger && scrubTween.scrollTrigger.kill(); scrubTween.kill(); }
-    const words = $$('.say-text .wi');
-    gsap.set(words, { opacity: 0.12 });
-    scrubTween = gsap.to(words, {
-      opacity: 1, stagger: 0.12, ease: 'none',
-      scrollTrigger: { trigger: '.say', start: 'top top', end: '+=150%', pin: true, scrub: 0.5 },
-    });
-  }
+  // Un sol ScrollTrigger fix per a tota la vida de la pàgina: si es tornés a crear en
+  // canviar d'idioma, les seccions fixades de després calcularien malament on comencen
+  // i es trepitjarien. En canviar d'idioma només es tornen a agafar les paraules.
+  let sayWords = [];
+  const sayTarget = { p: 0 };
+  const paintSay = () => {
+    const n = sayWords.length;
+    sayWords.forEach((w, i) => { w.style.opacity = String(0.12 + 0.88 * Math.min(1, Math.max(0, sayTarget.p * (n + 2) - i))); });
+  };
+  function buildScrub() { sayWords = $$('.say-text .wi'); paintSay(); }
   buildScrub();
+  ScrollTrigger.create({
+    trigger: '.say', start: 'top top', end: '+=150%', pin: true,
+    onUpdate: (self) => gsap.to(sayTarget, { p: self.progress, duration: 0.5, ease: 'power2.out', overwrite: true, onUpdate: paintSay }),
+  });
 
   // --- Titulars de secció: les paraules pugen quan arriben ---
   $$('section [data-split]').forEach((el) => {
