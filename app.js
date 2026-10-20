@@ -9,6 +9,24 @@
   const motion = !reduce && !!(window.gsap && window.ScrollTrigger);
   document.documentElement.classList.remove('no-js');
 
+  // ---------- Intro del logo (CSS); es pot saltar amb un clic, una tecla o fent scroll ----------
+  const introEl = $('[data-intro]');
+  let introOn = document.documentElement.classList.contains('has-intro');
+  const afterIntro = [];
+  const whenIntroEnds = (fn) => (introOn ? afterIntro.push(fn) : fn());
+  function endIntro(skipped) {
+    if (!introOn) return;
+    introOn = false;
+    clearTimeout(window.__introEnd);
+    const finish = () => { document.documentElement.classList.remove('has-intro'); afterIntro.splice(0).forEach((fn) => fn(skipped)); };
+    if (skipped) { introEl.classList.add('skipped'); setTimeout(finish, 350); } else finish();
+  }
+  if (introOn) {
+    setTimeout(() => endIntro(false), 2850);
+    const skip = () => endIntro(true);
+    ['pointerdown', 'keydown', 'wheel', 'touchstart'].forEach((ev) => addEventListener(ev, skip, { once: true, passive: true }));
+  }
+
   // ---------- Idioma ----------
   const LANGS = ['ca', 'es', 'en'];
   function pickLang() {
@@ -119,7 +137,7 @@
       const first = $('[data-open="TikTok"]');
       first.classList.add('pulse');
       setTimeout(() => { first.classList.remove('pulse'); if (!touched && x.hidden) openX('TikTok', false); }, 2200);
-    }, 3600);
+    }, introOn ? 6000 : 3600);
   }
   $('[data-x-close]').addEventListener('click', () => done(t('x.resisted'), true));
   $('[data-x-enter]').addEventListener('click', () => { $('[data-x-actions]').hidden = true; $('[data-x-pick]').hidden = false; });
@@ -293,6 +311,7 @@
     gsap.ticker.add((time) => lenis.raf(time * 1000));
     gsap.ticker.lagSmoothing(0);
     document.documentElement.classList.add('lenis');
+    if (introOn) { lenis.stop(); whenIntroEnds(() => lenis.start()); }
   }
   $$('a[href^="#"]').forEach((a) => a.addEventListener('click', (e) => {
     const id = a.getAttribute('href');
@@ -306,7 +325,9 @@
   gsap.to('[data-progress]', { scaleX: 1, ease: 'none', scrollTrigger: { start: 0, end: 'max', scrub: 0.3 } });
 
   // --- 1. Entrada del hero ---
-  const intro = gsap.timeline({ defaults: { ease: 'expo.out' } });
+  // Amb la intro, el hero comença just quan puja la persiana (o de seguida si se la salten).
+  const intro = gsap.timeline({ defaults: { ease: 'expo.out' }, delay: introOn ? 2.2 : 0 });
+  whenIntroEnds((skipped) => { if (skipped) intro.delay(0.1); });
   intro
     .from('.hero .kicker', { y: 20, opacity: 0, duration: 1 })
     .from('.hero-title .wi', { yPercent: 115, duration: 1.3, stagger: 0.08 }, 0.1)

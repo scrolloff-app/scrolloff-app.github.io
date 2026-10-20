@@ -16,8 +16,31 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800;900&display=swap">
 <link rel="stylesheet" href="styles.css">
+<script>
+  // Intro amb el logo, com la de l'app. Es treu sola encara que app.js no carregui.
+  (function () {
+    try { if (matchMedia('(prefers-reduced-motion: reduce)').matches) return; } catch (e) { return; }
+    var html = document.documentElement;
+    html.classList.add('has-intro');
+    window.__introEnd = setTimeout(function () { html.classList.remove('has-intro'); }, 2900);
+  })();
+</script>
 </head>
 <body>
+<div class="intro" data-intro aria-hidden="true">
+  <div class="intro-lock">
+    <svg class="intro-mark" viewBox="0 0 100 100">
+      <defs>
+        <linearGradient id="ig-l" x1="0" x2="1"><stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#B9B8B4"/></linearGradient>
+        <linearGradient id="ig-r" x1="0" x2="1"><stop offset="0" stop-color="#B9B8B4"/><stop offset="1" stop-color="#6A6A6E"/></linearGradient>
+      </defs>
+      <circle class="im-c" cx="50" cy="50" r="47.4"/>
+      <path class="im-r" d="M66 8.5 Q69.9 43.77 92 50 Q69.9 56.23 66 91.5 Q59.5 60.38 40 50 Q59.5 39.63 66 8.5Z" fill="url(#ig-r)"/>
+      <path class="im-l" d="M34 8.5 Q40.5 39.63 60 50 Q40.5 60.38 34 91.5 Q30.1 56.23 8 50 Q30.1 43.77 34 8.5Z" fill="url(#ig-l)"/>
+    </svg>
+    <p class="intro-name">Scroll<b>Off</b></p>
+  </div>
+</div>
 <a class="skip" href="#main" data-i18n="skip">Salta al contingut</a>
 <div class="progress" aria-hidden="true"><span data-progress></span></div>
 
