@@ -4,9 +4,10 @@
   const $ = (s, el = document) => el.querySelector(s);
   const $$ = (s, el = document) => [...el.querySelectorAll(s)];
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const fine = matchMedia('(hover: hover) and (pointer: fine)').matches;
+  // Si GSAP no arriba (xarxa del cole, bloquejador…), la web funciona igual, sense moviment.
+  const motion = !reduce && !!(window.gsap && window.ScrollTrigger);
   document.documentElement.classList.remove('no-js');
-  // Amb "reduir moviment" el vídeo de fons queda aturat al pòster.
-  if (reduce) document.querySelectorAll('video[autoplay]').forEach(v => { v.removeAttribute('autoplay'); v.pause(); });
 
   // ---------- Idioma ----------
   const LANGS = ['ca', 'es', 'en'];
@@ -16,16 +17,22 @@
     try { const saved = localStorage.getItem('scrolloff.lang'); if (LANGS.includes(saved)) return saved; } catch (_) {}
     for (const l of navigator.languages || [navigator.language]) {
       const code = (l || '').slice(0, 2).toLowerCase();
-      if (code === 'ca' || code === 'es') return code;
-      if (code === 'en') return 'en';
+      if (LANGS.includes(code)) return code;
     }
     return 'ca';
   }
   let lang = pickLang();
   const t = (key) => (I18N[lang] && I18N[lang][key] !== undefined ? I18N[lang][key] : I18N.ca[key]);
   const fill = (s, vars) => s.replace(/\{(\w+)\}/g, (_, k) => (vars[k] !== undefined ? vars[k] : ''));
+  const esc = (s) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   const listeners = [];
   const onLang = (fn) => { listeners.push(fn); fn(); };
+
+  // Parteix un text en paraules (cada una dins d'una màscara) per animar-les.
+  function split(el) {
+    const words = el.textContent.trim().split(/\s+/);
+    el.innerHTML = words.map((w) => `<span class="w"><span class="wi">${esc(w)}</span></span>`).join(' ');
+  }
 
   function applyLang() {
     document.documentElement.lang = lang;
@@ -40,28 +47,20 @@
         if (typeof v === 'string') el.setAttribute(attr, v);
       });
     });
+    $$('[data-split], [data-scrub]').forEach(split);
     $$('[data-lang]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.lang === lang)));
     listeners.forEach((fn) => fn());
   }
   $$('[data-lang]').forEach((b) => b.addEventListener('click', () => {
+    if (b.dataset.lang === lang) return;
     lang = b.dataset.lang;
     try { localStorage.setItem('scrolloff.lang', lang); } catch (_) {}
     applyLang();
+    if (motion) { buildScrub(); ScrollTrigger.refresh(); }
   }));
 
   const numFmt = () => new Intl.NumberFormat(lang === 'en' ? 'en-GB' : lang === 'es' ? 'es-ES' : 'ca-ES', { maximumFractionDigits: 1 });
-  const hm = (min) => {
-    const h = Math.floor(min / 60), m = min % 60;
-    if (lang === 'en') return h ? `${h} h ${m} min` : `${m} min`;
-    return h ? `${h} h ${m} min` : `${m} min`;
-  };
-
-  // ---------- Entrades en fer scroll ----------
-  const io = 'IntersectionObserver' in window ? new IntersectionObserver((entries) => {
-    entries.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
-  }, { threshold: 0.15, rootMargin: '0px 0px -8% 0px' }) : null;
-  $$('section').forEach((sec) => $$('[data-reveal]', sec).forEach((el, i) => el.style.setProperty('--i', i)));
-  $$('[data-reveal]').forEach((el) => (io ? io.observe(el) : el.classList.add('in')));
+  const hm = (min) => { const h = Math.floor(min / 60), m = min % 60; return h ? `${h} h ${m} min` : `${m} min`; };
 
   // ---------- Hero: comptadors que pugen sols ----------
   const ticks = $$('[data-tick]').map((el) => ({ el, min: Number(el.dataset.tick) }));
@@ -90,7 +89,7 @@
       else label.textContent = fill(t('x.wait'), { s });
     }, 1000);
   }
-  function openX(app) {
+  function openX(app, focus = true) {
     currentApp = app;
     phraseIdx = Math.floor(Math.random() * 10);
     $('[data-x-before]').textContent = fill(t('x.before'), { app });
@@ -98,7 +97,7 @@
     $('[data-x-actions]').hidden = false; $('[data-x-pick]').hidden = true; $('[data-x-done]').hidden = true;
     x.classList.remove('out'); x.hidden = false; apps.setAttribute('aria-hidden', 'true');
     startCountdown();
-    $('[data-x-close]').focus({ preventScroll: true });
+    if (focus) $('[data-x-close]').focus({ preventScroll: true });
   }
   function closeX() {
     clearInterval(timer);
@@ -113,15 +112,14 @@
   }
   let touched = false;
   $$('[data-open]').forEach((b) => b.addEventListener('click', () => { touched = true; openX(b.dataset.open); }));
-  // Una sola vegada, si el visitant encara no ha tocat res: el botó de TikTok
-  // batega i l'Xcape s'obre sol, perquè es vegi què fa l'app.
+  // Una sola vegada, si el visitant encara no ha tocat res: TikTok batega i l'Xcape s'obre sol.
   if (!reduce) {
     setTimeout(() => {
-      if (touched || !x.hidden) return;
+      if (touched || !x.hidden || scrollY > innerHeight * 0.5) return;
       const first = $('[data-open="TikTok"]');
       first.classList.add('pulse');
-      setTimeout(() => { first.classList.remove('pulse'); if (!touched && x.hidden) openX('TikTok'); }, 2200);
-    }, 2400);
+      setTimeout(() => { first.classList.remove('pulse'); if (!touched && x.hidden) openX('TikTok', false); }, 2200);
+    }, 3600);
   }
   $('[data-x-close]').addEventListener('click', () => done(t('x.resisted'), true));
   $('[data-x-enter]').addEventListener('click', () => { $('[data-x-actions]').hidden = true; $('[data-x-pick]').hidden = false; });
@@ -133,12 +131,14 @@
     const sb = $('[data-x-static-before]'); if (sb) sb.textContent = fill(t('x.before'), { app: 'TikTok' });
     const sp = $('[data-x-static-phrase]'); if (sp) sp.textContent = phrases()[7];
   });
-  // Mentre l'Xcape és obert, la frase canvia sola cada pocs segons, com a l'app.
   if (!reduce) setInterval(() => { if (!x.hidden && !$('[data-x-actions]').hidden) { phraseIdx += 1; setPhrase(); } }, 5500);
 
-  // ---------- Calculadora ----------
+  // ---------- Calculadora i l'any en quadrats ----------
   const range = $('#hours'), out = $('#hours-out'), days = $('[data-days]'), how = $('[data-calc-how]');
-  let shown = 53;
+  const year = $('[data-year]');
+  year.innerHTML = Array.from({ length: 365 }, (_, i) => `<i style="--i:${i}"></i>`).join('');
+  const cells = $$('i', year);
+  let shown = 53, yearSeen = false;
   function animateNumber(el, from, to, ms = 600) {
     if (reduce) { el.textContent = to; return; }
     const t0 = performance.now();
@@ -149,6 +149,7 @@
     };
     requestAnimationFrame(step);
   }
+  const paintYear = (d) => cells.forEach((c, i) => c.classList.toggle('on', i < d));
   function calc(animate) {
     const h = Number(range.value), d = Math.round((h * 365) / 24);
     const hs = numFmt().format(h);
@@ -156,33 +157,35 @@
     how.textContent = fill(t('calc.how'), { h: hs, d });
     if (animate) animateNumber(days, shown, d, 450); else days.textContent = d;
     shown = d;
+    if (yearSeen || reduce || !('IntersectionObserver' in window)) paintYear(d);
   }
   range.addEventListener('input', () => calc(true));
   onLang(() => calc(false));
-  // La xifra compta des de 0 la primera vegada que es veu.
-  if (io) {
-    const once = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { animateNumber(days, 0, shown, 1400); once.disconnect(); } }), { threshold: 0.5 });
-    once.observe(days);
-  }
-
-  // ---------- Dades: els números pugen ----------
-  $$('[data-count]').forEach((el) => {
-    if (!io || reduce) return;
-    const ob = new IntersectionObserver((es) => es.forEach((e) => {
+  if ('IntersectionObserver' in window && !reduce) {
+    const once = new IntersectionObserver((es) => es.forEach((e) => {
       if (!e.isIntersecting) return;
-      ob.disconnect();
-      const txt = el.textContent, m = txt.match(/\d+/);
-      if (!m) return;
-      const target = Number(m[0]), t0 = performance.now();
-      const step = (now) => {
-        const p = Math.min(1, (now - t0) / 1200), v = Math.round(target * (1 - Math.pow(1 - p, 3)));
-        el.textContent = txt.replace(m[0], String(v));
-        if (p < 1) requestAnimationFrame(step); else el.textContent = t(el.dataset.i18n);
-      };
-      requestAnimationFrame(step);
-    }), { threshold: 0.6 });
-    ob.observe(el);
-  });
+      once.disconnect(); yearSeen = true;
+      animateNumber(days, 0, shown, 1500);
+      year.classList.add('intro'); paintYear(shown);
+      setTimeout(() => year.classList.remove('intro'), 2200);
+    }), { threshold: 0.35 });
+    once.observe(year);
+  } else { yearSeen = true; paintYear(shown); }
+
+  // ---------- Dades: els números pugen quan es veuen ----------
+  function countUp(el) {
+    if (reduce || el.dataset.counted) return;
+    el.dataset.counted = '1';
+    const txt = el.textContent, m = txt.match(/\d+/);
+    if (!m) return;
+    const target = Number(m[0]), t0 = performance.now();
+    const step = (now) => {
+      const p = Math.min(1, (now - t0) / 1300), v = Math.round(target * (1 - Math.pow(1 - p, 3)));
+      el.textContent = txt.replace(m[0], String(v));
+      if (p < 1) requestAnimationFrame(step); else el.textContent = t(el.dataset.i18n);
+    };
+    requestAnimationFrame(step);
+  }
 
   // ---------- Simulador d'avisos ----------
   const nState = { app: 'Instagram', hours: 2, on: true, msg: 0 };
@@ -205,89 +208,252 @@
   const next = $('[data-nudge-next]');
   next.addEventListener('click', () => { nState.msg += 1; next.classList.toggle('spin'); renderNudge(true); });
   onLang(() => { next.setAttribute('aria-label', t('nudge.next')); renderNudge(false); });
-  // Rellotge de la pantalla de bloqueig
-  const lockTime = $('[data-lock-time]');
   const clockStr = (tz) => new Intl.DateTimeFormat('ca-ES', { hour: '2-digit', minute: '2-digit', timeZone: tz }).format(new Date());
   const tickClock = () => {
-    lockTime.textContent = clockStr(undefined);
-    const dc = $('[data-demo-clock]'); if (dc) dc.textContent = clockStr(undefined);
-    const c = $('[data-clock]'); if (c) c.textContent = clockStr('Europe/Madrid');
+    $('[data-lock-time]').textContent = clockStr(undefined);
+    $('[data-demo-clock]').textContent = clockStr(undefined);
+    $('[data-clock]').textContent = clockStr('Europe/Madrid');
   };
   tickClock(); setInterval(tickClock, 15000);
-  // L'avís "arriba" quan el panell entra a la pantalla
-  if (io) { const ob = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { renderNudge(true); ob.disconnect(); } }), { threshold: 0.5 }); ob.observe(notif); }
+  if ('IntersectionObserver' in window) { const ob = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { renderNudge(true); ob.disconnect(); } }), { threshold: 0.5 }); ob.observe(notif); }
 
-  // ---------- Llista de funcions ----------
-  const list = $('[data-feat-list]'), search = $('[data-feat-search]');
-  const items = $$('li', list);
-  const shots = $$('[data-shot]');
-  function select(li) {
-    items.forEach((x) => x.setAttribute('aria-selected', String(x === li)));
-    if (!li) return;
-    const key = li.dataset.img;
-    shots.forEach((img) => img.classList.toggle('on', img.dataset.shot === key));
-  }
-  items.forEach((li) => {
-    li.tabIndex = 0;
-    li.addEventListener('click', () => select(li));
-    li.addEventListener('mouseenter', () => { if (matchMedia('(hover: hover)').matches) select(li); });
-    li.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); select(li); } });
-  });
-  function visible() { return items.filter((li) => !li.hidden); }
-  search.addEventListener('input', () => {
-    const q = search.value.trim().toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '');
-    items.forEach((li) => {
-      const text = (li.textContent || '').toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '');
-      li.hidden = q !== '' && !text.includes(q);
+  // ---------- Paraules en moviment ----------
+  const rows = $$('[data-marquee]');
+  onLang(() => {
+    const words = t('out.words');
+    rows.forEach((r, i) => {
+      const list = i ? [...words].reverse() : words;
+      const chunk = list.map((w) => `<span>${esc(w)}</span>`).join('');
+      r.innerHTML = chunk + chunk; // dues còpies: quan una surt, l'altra entra
+      r._x = i ? -r.scrollWidth / 2 : 0;
     });
-    const v = visible();
-    $('[data-feat-empty]').hidden = v.length > 0;
-    if (v.length && !v.some((li) => li.getAttribute('aria-selected') === 'true')) select(v[0]);
   });
-  search.addEventListener('keydown', (e) => {
-    const v = visible(); if (!v.length) return;
-    let i = v.findIndex((li) => li.getAttribute('aria-selected') === 'true');
-    if (e.key === 'ArrowDown') { e.preventDefault(); select(v[Math.min(v.length - 1, i + 1)]); }
-    if (e.key === 'ArrowUp') { e.preventDefault(); select(v[Math.max(0, i - 1)]); }
-  });
-  select(items[0]);
 
-  // ---------- Formulari: obre el correu amb el missatge escrit ----------
-  const form = $('[data-join]'), segOs = $('[data-seg-os]');
+  // ---------- Formulari: s'envia de veritat (Supabase), sense dependre del correu ----------
+  // Clau pública (la mateixa que porta l'app): només pot inserir; les regles de la base
+  // de dades no deixen llegir res i limiten els enviaments.
+  const SB_URL = 'https://qaijwaowtenjuuxqabtq.supabase.co/rest/v1/feedback';
+  const SB_KEY = 'sb_publishable_awxkvjC9sHhdO739ash_Sw_CfmD8nmB';
+  const form = $('[data-join]'), segOs = $('[data-seg-os]'), msg = $('[data-join-msg]'), sendBtn = $('[data-join-btn]');
   let os = 'Android';
   $$('button', segOs).forEach((b) => b.addEventListener('click', () => { os = b.dataset.v; radio(segOs, os); }));
-  form.addEventListener('submit', (e) => {
+  form.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const email = $('#join-email').value.trim();
-    if (!$('#join-email').checkValidity()) { $('#join-email').reportValidity(); return; }
-    const subject = encodeURIComponent(fill(t('mail.subject'), { os }));
-    const body = encodeURIComponent(fill(t('mail.body'), { os, email }));
-    location.href = `mailto:danielmeller@gmail.com,david.meller.e@gmail.com?subject=${subject}&body=${body}`;
+    const input = $('#join-email');
+    const email = input.value.trim();
+    if (!input.checkValidity() || !email) { input.reportValidity(); input.focus(); return; }
+    const showDone = () => {
+      $('[data-join-ok-sub]').textContent = fill(t('form.okSub'), { email });
+      $('[data-join-body]').hidden = true; $('[data-join-done]').hidden = false;
+    };
+    if (form.website.value) { showDone(); return; } // camp trampa per a robots
+    sendBtn.disabled = true; msg.className = 'form-msg sending'; msg.textContent = t('form.sending');
+    try {
+      const res = await fetch(SB_URL, {
+        method: 'POST',
+        headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}`, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
+        body: JSON.stringify({ category: 'other', message: fill(t('form.msg'), { os }), contact_email: email, platform: 'web', locale: lang }),
+      });
+      if (!res.ok) throw new Error(String(res.status));
+      msg.textContent = '';
+      showDone();
+    } catch (_) {
+      msg.className = 'form-msg'; msg.textContent = t('form.err');
+    } finally {
+      sendBtn.disabled = false;
+    }
   });
 
-  // ---------- La demo puja una mica en fer scroll ----------
-  const demo = $('#demo');
-  if (!reduce && demo && matchMedia('(min-width: 861px)').matches) {
-    let ticking = false;
-    addEventListener('scroll', () => {
-      if (ticking) return; ticking = true;
-      requestAnimationFrame(() => { const y = Math.min(scrollY, innerHeight); demo.style.setProperty('--demo-y', `${-y * 0.18}px`); ticking = false; });
-    }, { passive: true });
-  }
-
-  // ---------- La foto de Barcelona s'apropa lentament en fer scroll ----------
-  const outMedia = $('.out-media');
-  if (!reduce && outMedia) {
-    let busy = false;
-    const update = () => {
-      const r = outMedia.getBoundingClientRect();
-      const p = Math.min(1, Math.max(0, 1 - (r.top + r.height) / (innerHeight + r.height)));
-      outMedia.style.setProperty('--out-s', String(1.18 - p * 0.18));
-      busy = false;
-    };
-    addEventListener('scroll', () => { if (!busy) { busy = true; requestAnimationFrame(update); } }, { passive: true });
-    update();
-  }
-
   applyLang();
+
+  // ====================================================================
+  //  Moviment (només si GSAP ha carregat i el visitant no demana menys moviment)
+  // ====================================================================
+  const top = $('[data-top]');
+  addEventListener('scroll', () => top.classList.toggle('scrolled', scrollY > 30), { passive: true });
+
+  if (!motion) {
+    if ('IntersectionObserver' in window) {
+      const ob = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { countUp(e.target); e.target.closest('[data-card]')?.classList.add('play'); } }), { threshold: 0.4 });
+      $$('[data-count]').forEach((el) => ob.observe(el));
+    }
+    $$('[data-card]').forEach((c) => c.classList.add('play'));
+    // Com funciona sense GSAP: el pas actiu segons el que es veu
+    stepsWithObserver();
+    return;
+  }
+
+  gsap.registerPlugin(ScrollTrigger);
+
+  // Scroll suau (Lenis), sincronitzat amb ScrollTrigger
+  let lenis = null;
+  if (window.Lenis) {
+    lenis = new Lenis({ lerp: 0.1, smoothWheel: true });
+    lenis.on('scroll', ScrollTrigger.update);
+    gsap.ticker.add((time) => lenis.raf(time * 1000));
+    gsap.ticker.lagSmoothing(0);
+    document.documentElement.classList.add('lenis');
+  }
+  $$('a[href^="#"]').forEach((a) => a.addEventListener('click', (e) => {
+    const id = a.getAttribute('href');
+    const target = id.length > 1 ? $(id) : null;
+    if (!target || !lenis) return;
+    e.preventDefault();
+    lenis.scrollTo(target, { offset: -70, duration: 1.4 });
+  }));
+
+  // Barra de progrés
+  gsap.to('[data-progress]', { scaleX: 1, ease: 'none', scrollTrigger: { start: 0, end: 'max', scrub: 0.3 } });
+
+  // --- 1. Entrada del hero ---
+  const intro = gsap.timeline({ defaults: { ease: 'expo.out' } });
+  intro
+    .from('.hero .kicker', { y: 20, opacity: 0, duration: 1 })
+    .from('.hero-title .wi', { yPercent: 115, duration: 1.3, stagger: 0.08 }, 0.1)
+    .from('.hero-p, .hero-actions', { y: 30, opacity: 0, duration: 1.1, stagger: 0.12 }, 0.5)
+    .from('.stage', { y: 260, opacity: 0, duration: 1.8 }, 0.25)
+    .from('.hero-phone', { '--rx': '48deg', duration: 1.8 }, 0.25)
+    .from('.float-n', { scale: 0.5, opacity: 0, y: 30, duration: 0.9, stagger: 0.18, ease: 'back.out(1.8)' }, 1.1)
+    .from('.scroll-cue', { opacity: 0, duration: 1 }, 1.4);
+  // Les notificacions suren
+  $$('.float-n').forEach((n, i) => gsap.to(n, { y: i % 2 ? 14 : -14, rotate: i % 2 ? 1.5 : -1.5, duration: 2.4 + i * 0.4, ease: 'sine.inOut', yoyo: true, repeat: -1, delay: 2 + i * 0.2 }));
+  // En fer scroll: el text puja i es difumina, les notificacions surten volant
+  gsap.timeline({ scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: 0.6 } })
+    .to('[data-hero-copy]', { yPercent: -25, opacity: 0, filter: 'blur(10px)', ease: 'none' }, 0)
+    .to('.float-n', { x: (i) => (i % 2 ? 260 : -260), y: (i) => -160 - i * 60, opacity: 0, scale: 0.8, ease: 'power1.in' }, 0)
+    .to('.hero-phone', { '--rx': '0deg', '--ry': '0deg', ease: 'none' }, 0)
+    .to('.stage', { scale: 0.92, ease: 'none' }, 0);
+  // El mòbil segueix el ratolí
+  const phone = $('[data-tilt]');
+  if (fine && phone) {
+    const qx = gsap.quickTo(phone, '--ry', { duration: 0.8, ease: 'power3.out', unit: 'deg' });
+    const qy = gsap.quickTo(phone, '--rx', { duration: 0.8, ease: 'power3.out', unit: 'deg' });
+    $('.hero').addEventListener('pointermove', (e) => {
+      if (scrollY > innerHeight * 0.3) return;
+      const r = innerWidth, h = innerHeight;
+      qx(-16 + ((e.clientX / r) - 0.5) * 22);
+      qy(8 - ((e.clientY / h) - 0.5) * 16);
+    });
+  }
+
+  // --- 2. La frase s'il·lumina paraula a paraula (secció fixada) ---
+  let scrubTween = null;
+  function buildScrub() {
+    if (scrubTween) { scrubTween.scrollTrigger && scrubTween.scrollTrigger.kill(); scrubTween.kill(); }
+    const words = $$('.say-text .wi');
+    gsap.set(words, { opacity: 0.12 });
+    scrubTween = gsap.to(words, {
+      opacity: 1, stagger: 0.12, ease: 'none',
+      scrollTrigger: { trigger: '.say', start: 'top top', end: '+=150%', pin: true, scrub: 0.5 },
+    });
+  }
+  buildScrub();
+
+  // --- Titulars de secció: les paraules pugen quan arriben ---
+  $$('section [data-split]').forEach((el) => {
+    if (el.closest('.hero')) return;
+    gsap.from($$('.wi', el), { yPercent: 115, duration: 1.1, ease: 'expo.out', stagger: 0.06, scrollTrigger: { trigger: el, start: 'top 88%' } });
+  });
+  // --- Entrades genèriques ---
+  const reveals = $$('[data-reveal]');
+  gsap.set(reveals, { y: 50, opacity: 0 });
+  ScrollTrigger.batch(reveals, { start: 'top 90%', onEnter: (b) => gsap.to(b, { y: 0, opacity: 1, duration: 1.1, ease: 'expo.out', stagger: 0.08 }) });
+  // La xifra gran s'apropa mentre passa
+  gsap.fromTo('.figure', { scale: 0.85 }, { scale: 1, ease: 'none', scrollTrigger: { trigger: '.calc', start: 'top bottom', end: 'center center', scrub: 0.6 } });
+
+  // --- 4. Dades: pista horitzontal fixada (ordinador) o en columna (mòbil) ---
+  const mm = gsap.matchMedia();
+  mm.add('(min-width: 861px)', () => {
+    const track = $('[data-track]');
+    const dist = () => track.scrollWidth - innerWidth;
+    const h = gsap.to(track, {
+      x: () => -dist(), ease: 'none',
+      scrollTrigger: { trigger: '[data-data-pin]', start: 'top top', end: () => `+=${dist()}`, pin: true, scrub: 0.8, invalidateOnRefresh: true },
+    });
+    $$('.stat').forEach((card) => {
+      gsap.from(card, { rotate: 4, y: 60, opacity: 0.3, ease: 'none', scrollTrigger: { trigger: card, containerAnimation: h, start: 'left 100%', end: 'left 55%', scrub: true } });
+      ScrollTrigger.create({ trigger: card, containerAnimation: h, start: 'left 75%', onEnter: () => countUp($('[data-count]', card)) });
+    });
+  });
+  mm.add('(max-width: 860px)', () => {
+    $$('.stat').forEach((card) => {
+      gsap.from(card, { y: 60, opacity: 0, duration: 1, ease: 'expo.out', scrollTrigger: { trigger: card, start: 'top 88%' } });
+      ScrollTrigger.create({ trigger: card, start: 'top 75%', onEnter: () => countUp($('[data-count]', card)) });
+    });
+  });
+
+  // --- 5. Com funciona: el pas actiu canvia la pantalla del mòbil ---
+  const howGrid = $('.how-grid'), howPhone = $('[data-how-phone]');
+  const setStep = (n) => {
+    howPhone.dataset.at = String(n); howGrid.dataset.at = String(n);
+    $$('.step').forEach((s) => s.classList.toggle('active', s.dataset.step === String(n)));
+  };
+  setStep(1);
+  mm.add('(min-width: 861px)', () => {
+    $$('.step').forEach((s) => ScrollTrigger.create({ trigger: s, start: 'top 60%', end: 'bottom 40%', onToggle: (self) => { if (self.isActive) setStep(Number(s.dataset.step)); } }));
+  });
+  mm.add('(max-width: 860px)', () => {
+    howGrid.classList.add('how-pinned');
+    ScrollTrigger.create({ trigger: howGrid, start: 'top top', end: '+=220%', pin: true, onUpdate: (self) => setStep(1 + Math.min(2, Math.floor(self.progress * 3))) });
+    return () => howGrid.classList.remove('how-pinned');
+  });
+  gsap.from('.how-phone', { y: 120, rotateX: 30, opacity: 0, duration: 1.4, ease: 'expo.out', scrollTrigger: { trigger: '.how-grid', start: 'top 80%' } });
+
+  // --- 6. El panell d'avisos s'inclina en entrar ---
+  gsap.fromTo('.nudge-panel', { rotateX: 18, transformPerspective: 1200 }, { rotateX: 0, ease: 'none', scrollTrigger: { trigger: '.nudge', start: 'top bottom', end: 'center center', scrub: 0.6 } });
+
+  // --- 7. Graella: les peces entren en onada i s'inclinen amb el ratolí ---
+  const cards = $$('[data-card]');
+  gsap.set(cards, { y: 80, opacity: 0, rotateX: 12 });
+  ScrollTrigger.batch(cards, { start: 'top 90%', onEnter: (b) => gsap.to(b, { y: 0, opacity: 1, rotateX: 0, duration: 1.2, ease: 'expo.out', stagger: 0.09 }) });
+  cards.forEach((c) => ScrollTrigger.create({ trigger: c, start: 'top 95%', end: 'bottom 5%', toggleClass: 'play' }));
+  if (fine) cards.forEach((c) => {
+    const rx = gsap.quickTo(c, 'rotateX', { duration: 0.6, ease: 'power3.out' });
+    const ry = gsap.quickTo(c, 'rotateY', { duration: 0.6, ease: 'power3.out' });
+    c.addEventListener('pointermove', (e) => {
+      const r = c.getBoundingClientRect();
+      ry(((e.clientX - r.left) / r.width - 0.5) * 10);
+      rx(-((e.clientY - r.top) / r.height - 0.5) * 10);
+    });
+    c.addEventListener('pointerleave', () => { rx(0); ry(0); });
+  });
+
+  // --- 8. Paraules en moviment: més ràpid com més ràpid fas scroll ---
+  let vel = 0;
+  ScrollTrigger.create({ onUpdate: (self) => { vel = self.getVelocity(); } });
+  gsap.ticker.add((_, dt) => {
+    vel *= 0.92;
+    const boost = 1 + Math.min(8, Math.abs(vel) / 400);
+    rows.forEach((r, i) => {
+      const half = r.scrollWidth / 2;
+      if (!half) return;
+      r._x = (r._x || 0) + (i ? 1 : -1) * 0.9 * boost * (dt / 16.7);
+      if (r._x <= -half) r._x += half;
+      if (r._x > 0) r._x -= half;
+      r.style.transform = `translate3d(${r._x.toFixed(1)}px,0,0)`;
+    });
+  });
+
+  // --- 10. Tancament: el títol creix i la paraula del peu s'obre ---
+  gsap.from('.cta-title', { scale: 0.86, transformOrigin: '0% 100%', ease: 'none', scrollTrigger: { trigger: '.cta', start: 'top bottom', end: 'top 20%', scrub: 0.6 } });
+  gsap.from('[data-foot-word]', { yPercent: 60, letterSpacing: '0.1em', opacity: 0, ease: 'none', scrollTrigger: { trigger: '.foot', start: 'top bottom', end: 'top 40%', scrub: 0.6 } });
+
+  // Botons magnètics
+  if (fine) $$('[data-magnetic]').forEach((b) => {
+    const qx = gsap.quickTo(b, 'x', { duration: 0.5, ease: 'power3.out' }), qy = gsap.quickTo(b, 'y', { duration: 0.5, ease: 'power3.out' });
+    b.addEventListener('pointermove', (e) => { const r = b.getBoundingClientRect(); qx((e.clientX - r.left - r.width / 2) * 0.3); qy((e.clientY - r.top - r.height / 2) * 0.4); });
+    b.addEventListener('pointerleave', () => { qx(0); qy(0); });
+  });
+
+  // Quan carreguen les lletres, les mides canvien: recalcula
+  document.fonts && document.fonts.ready.then(() => ScrollTrigger.refresh());
+
+  function stepsWithObserver() {
+    const grid = $('.how-grid'), ph = $('[data-how-phone]');
+    const set = (n) => { ph.dataset.at = String(n); grid.dataset.at = String(n); $$('.step').forEach((s) => s.classList.toggle('active', s.dataset.step === String(n))); };
+    set(1);
+    if (!('IntersectionObserver' in window)) return;
+    const ob = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) set(Number(e.target.dataset.step)); }), { rootMargin: '-45% 0px -45% 0px' });
+    $$('.step').forEach((s) => ob.observe(s));
+  }
 })();
