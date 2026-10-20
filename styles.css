@@ -117,10 +117,11 @@ button { cursor: pointer; }
 
 /* ============ 1. Hero ============ */
 .hero { position: relative; min-height: 100svh; padding: 120px var(--margin) 80px; display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); align-items: center; gap: clamp(24px, 4vw, 64px); }
-.hero-title { font-size: var(--s1); font-weight: 900; line-height: .9; letter-spacing: -0.055em; }
+.hero-copy { min-width: 0; position: relative; z-index: 3; }
+.hero-title { font-size: clamp(56px, 8.6vw, 172px); font-weight: 900; line-height: .9; letter-spacing: -0.055em; }
 .hero-p { margin-top: 28px; color: var(--muted); font-size: clamp(18px, 1.5vw, 22px); line-height: 1.5; max-width: 36ch; }
 .hero-actions { margin-top: 34px; display: flex; align-items: center; gap: 28px; flex-wrap: wrap; }
-.stage { position: relative; display: grid; place-items: center; perspective: 1600px; min-height: 640px; }
+.stage { position: relative; min-width: 0; display: grid; place-items: center; perspective: 1600px; min-height: 640px; }
 .floats { position: absolute; inset: 0; pointer-events: none; z-index: 2; }
 .float-n {
   position: absolute; display: flex; align-items: center; gap: 12px; padding: 12px 16px 12px 12px; width: max-content; max-width: 300px;
@@ -131,9 +132,9 @@ button { cursor: pointer; }
 .float-n b { display: block; font-size: 13px; }
 .float-n span span { color: var(--muted); }
 .fi { flex: none; width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center; }
-.f1 { top: 8%; left: -4%; }
-.f2 { top: 34%; right: -10%; }
-.f3 { bottom: 24%; left: -8%; }
+.f1 { top: 8%; left: 2%; }
+.f2 { top: 34%; right: 0; }
+.f3 { bottom: 24%; left: 0; }
 .f4 { bottom: 6%; right: 0%; }
 .scroll-cue { position: absolute; left: 50%; bottom: 26px; translate: -50% 0; display: grid; justify-items: center; gap: 10px; font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); text-decoration: none; }
 .scroll-cue i { width: 2px; height: 46px; background: linear-gradient(var(--accent), transparent); transform-origin: top; animation: cue 1.8s var(--ease-out) infinite; }
