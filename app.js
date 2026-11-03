@@ -80,76 +80,14 @@
   const numFmt = () => new Intl.NumberFormat(lang === 'en' ? 'en-GB' : lang === 'es' ? 'es-ES' : 'ca-ES', { maximumFractionDigits: 1 });
   const hm = (min) => { const h = Math.floor(min / 60), m = min % 60; return h ? `${h} h ${m} min` : `${m} min`; };
 
-  // ---------- Hero: comptadors que pugen sols ----------
-  const ticks = $$('[data-tick]').map((el) => ({ el, min: Number(el.dataset.tick) }));
-  const renderTicks = () => {
-    ticks.forEach((k) => (k.el.textContent = hm(k.min)));
-    const w = $('[data-widget-total]'); if (w) w.textContent = hm(ticks.reduce((sum, k) => sum + k.min, 0));
-  };
-  onLang(renderTicks);
-  if (!reduce) setInterval(() => { const k = ticks[Math.floor(Math.random() * ticks.length)]; k.min += 1; renderTicks(); }, 2600);
-
-  // ---------- L'Xcape que funciona ----------
-  const x = $('[data-xcape]');
-  const apps = $('[data-demo-apps]');
-  let phraseIdx = 0, timer = null, currentApp = 'TikTok';
-  const phrases = () => t('x.phrases');
-  function setPhrase() { const p = $('[data-x-phrase]'); p.style.animation = 'none'; void p.offsetWidth; p.style.animation = ''; p.textContent = phrases()[phraseIdx % phrases().length]; }
-  function startCountdown() {
-    const btn = $('[data-x-enter]'), label = $('[data-x-enter-label]');
-    let s = 5;
-    btn.disabled = true; btn.classList.remove('counting'); void btn.offsetWidth; btn.classList.add('counting');
-    label.textContent = fill(t('x.wait'), { s });
-    clearInterval(timer);
-    timer = setInterval(() => {
-      s -= 1;
-      if (s <= 0) { clearInterval(timer); btn.disabled = false; label.textContent = t('x.enter'); btn.classList.remove('counting'); }
-      else label.textContent = fill(t('x.wait'), { s });
-    }, 1000);
-  }
-  function openX(app, focus = true) {
-    currentApp = app;
-    phraseIdx = Math.floor(Math.random() * 10);
-    $('[data-x-before]').textContent = fill(t('x.before'), { app });
-    setPhrase();
-    $('[data-x-actions]').hidden = false; $('[data-x-pick]').hidden = true; $('[data-x-done]').hidden = true;
-    x.classList.remove('out'); x.hidden = false; apps.setAttribute('aria-hidden', 'true');
-    startCountdown();
-    if (focus) $('[data-x-close]').focus({ preventScroll: true });
-  }
-  function closeX() {
-    clearInterval(timer);
-    x.classList.add('out');
-    setTimeout(() => { x.hidden = true; x.classList.remove('out'); apps.removeAttribute('aria-hidden'); }, reduce ? 0 : 340);
-  }
-  function done(text, win) {
-    clearInterval(timer);
-    $('[data-x-actions]').hidden = true; $('[data-x-pick]').hidden = true;
-    const d = $('[data-x-done-text]'); d.textContent = text; d.classList.toggle('win', !!win);
-    $('[data-x-done]').hidden = false;
-  }
-  let touched = false;
-  $$('[data-open]').forEach((b) => b.addEventListener('click', () => { touched = true; openX(b.dataset.open); }));
-  // Una sola vegada, si el visitant encara no ha tocat res: TikTok batega i l'Xcape s'obre sol.
-  if (!reduce) {
-    setTimeout(() => {
-      if (touched || !x.hidden || scrollY > innerHeight * 0.5) return;
-      const first = $('[data-open="TikTok"]');
-      first.classList.add('pulse');
-      setTimeout(() => { first.classList.remove('pulse'); if (!touched && x.hidden) openX('TikTok', false); }, 2200);
-    }, introOn ? 6000 : 3600);
-  }
-  $('[data-x-close]').addEventListener('click', () => done(t('x.resisted'), true));
-  $('[data-x-enter]').addEventListener('click', () => { $('[data-x-actions]').hidden = true; $('[data-x-pick]').hidden = false; });
-  $$('[data-min]').forEach((b) => b.addEventListener('click', () => done(fill(t('x.entered'), { m: b.dataset.min }))));
-  $('[data-x-again]').addEventListener('click', closeX);
-  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !x.hidden) closeX(); });
-  onLang(() => {
-    if (!x.hidden) { $('[data-x-before]').textContent = fill(t('x.before'), { app: currentApp }); $('[data-x-phrase]').textContent = phrases()[phraseIdx % phrases().length]; }
-    const sb = $('[data-x-static-before]'); if (sb) sb.textContent = fill(t('x.before'), { app: 'TikTok' });
-    const sp = $('[data-x-static-phrase]'); if (sp) sp.textContent = phrases()[7];
+  // ---------- Vídeos reals de l'app: el mòbil de l'hero fa bucle quan es veu ----------
+  $$('video[data-video="loop"]').forEach((v) => {
+    v.muted = true;
+    if (reduce) { v.pause(); return; }
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) v.play().catch(() => {}); else v.pause(); }), { threshold: 0.2 }).observe(v);
+    } else v.play().catch(() => {});
   });
-  if (!reduce) setInterval(() => { if (!x.hidden && !$('[data-x-actions]').hidden) { phraseIdx += 1; setPhrase(); } }, 5500);
 
   // ---------- Calculadora i l'any en quadrats ----------
   const range = $('#hours'), out = $('#hours-out'), days = $('[data-days]'), how = $('[data-calc-how]');
@@ -229,7 +167,6 @@
   const clockStr = (tz) => new Intl.DateTimeFormat('ca-ES', { hour: '2-digit', minute: '2-digit', timeZone: tz }).format(new Date());
   const tickClock = () => {
     $('[data-lock-time]').textContent = clockStr(undefined);
-    $('[data-demo-clock]').textContent = clockStr(undefined);
     $('[data-clock]').textContent = clockStr('Europe/Madrid');
   };
   tickClock(); setInterval(tickClock, 15000);
@@ -408,10 +345,11 @@
   });
 
   // --- 5. Com funciona: el pas actiu canvia la pantalla del mòbil ---
-  const howGrid = $('.how-grid'), howPhone = $('[data-how-phone]');
+  const howGrid = $('.how-grid'), howPhone = $('[data-how-phone]'), howVids = $$('[data-how-video]');
   const setStep = (n) => {
     howPhone.dataset.at = String(n); howGrid.dataset.at = String(n);
     $$('.step').forEach((s) => s.classList.toggle('active', s.dataset.step === String(n)));
+    howVids.forEach((v) => { const on = Number(v.dataset.howVideo) === n; if (on) { if (v.dataset.on !== '1') v.currentTime = 0; v.dataset.on = '1'; if (!reduce) v.play().catch(() => {}); } else { v.dataset.on = ''; v.pause(); } });
   };
   setStep(1);
   mm.add('(min-width: 861px)', () => {
