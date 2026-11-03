@@ -76,7 +76,7 @@ button { cursor: pointer; }
 .top.scrolled { background: rgba(11,11,12,.72); backdrop-filter: saturate(160%) blur(18px); -webkit-backdrop-filter: saturate(160%) blur(18px); padding-block: 10px; border-color: rgba(255,255,255,.06); }
 .wordmark { display: flex; align-items: center; gap: 10px; text-decoration: none; font-weight: 800; font-size: 21px; letter-spacing: -0.02em; }
 .wordmark img { filter: brightness(0) invert(1); }
-.wordmark b { background: var(--gold-grad); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent; font-weight: 800; }
+.wordmark b { background: var(--gold-grad); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent; font-weight: 400; }
 .top-links { display: flex; gap: 26px; margin-left: auto; font-size: 15px; font-weight: 600; }
 .top-links a { text-decoration: none; color: var(--muted); transition: color .2s; }
 .top-links a:hover { color: var(--ink); }
@@ -106,7 +106,7 @@ button { cursor: pointer; }
   -webkit-mask-size: 300% 100%; mask-size: 300% 100%; -webkit-mask-position: 100% 0; mask-position: 100% 0;
   animation: im-name .9s cubic-bezier(.33, 1, .68, 1) 1.3s forwards;
 }
-.intro-name b { background: var(--gold-grad); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent; }
+.intro-name b { background: var(--gold-grad); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent; font-weight: 400; }
 @keyframes im-draw { to { stroke-dashoffset: 0; } }
 @keyframes im-left { from { opacity: 0; transform: translateX(-18%) scale(.55); filter: blur(6px); } to { opacity: 1; transform: none; filter: none; } }
 @keyframes im-right { from { opacity: 0; transform: translateX(18%) scale(.55); filter: blur(6px); } to { opacity: 1; transform: none; filter: none; } }
@@ -579,7 +579,7 @@ button { cursor: pointer; }
 /* Peu mínim: només privacitat i contacte */
 .foot-min { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 18px 32px; padding: 28px var(--margin) 40px; border-top: 1px solid var(--line); font-size: 15px; color: var(--muted); }
 .foot-min .foot-word { font-size: 22px; font-weight: 800; letter-spacing: -0.03em; color: var(--ink); }
-.foot-min .foot-word b { background: var(--gold-grad); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent; }
+.foot-min .foot-word b { background: var(--gold-grad); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent; font-weight: 400; }
 .foot-min nav { display: flex; flex-wrap: wrap; gap: 8px 24px; }
 .foot-min a { color: var(--ink); text-decoration: none; font-weight: 600; overflow-wrap: anywhere; }
 .foot-min a:hover { text-decoration: underline; text-underline-offset: 4px; }
