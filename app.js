@@ -77,56 +77,14 @@
     if (motion) { buildScrub(); ScrollTrigger.refresh(); }
   }));
 
-  const numFmt = () => new Intl.NumberFormat(lang === 'en' ? 'en-GB' : lang === 'es' ? 'es-ES' : 'ca-ES', { maximumFractionDigits: 1 });
-  const hm = (min) => { const h = Math.floor(min / 60), m = min % 60; return h ? `${h} h ${m} min` : `${m} min`; };
-
-  // ---------- Vídeos reals de l'app: el mòbil de l'hero fa bucle quan es veu ----------
+  // ---------- Vídeos reals de l'app: s'ajusten sols quan es veuen ----------
   $$('video[data-video="loop"]').forEach((v) => {
     v.muted = true;
     if (reduce) { v.pause(); return; }
     if ('IntersectionObserver' in window) {
-      new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) v.play().catch(() => {}); else v.pause(); }), { threshold: 0.2 }).observe(v);
+      new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) v.play().catch(() => {}); else v.pause(); }), { threshold: 0.25 }).observe(v);
     } else v.play().catch(() => {});
   });
-
-  // ---------- Calculadora i l'any en quadrats ----------
-  const range = $('#hours'), out = $('#hours-out'), days = $('[data-days]'), how = $('[data-calc-how]');
-  const year = $('[data-year]');
-  year.innerHTML = Array.from({ length: 365 }, (_, i) => `<i style="--i:${i}"></i>`).join('');
-  const cells = $$('i', year);
-  let shown = 53, yearSeen = false;
-  function animateNumber(el, from, to, ms = 600) {
-    if (reduce) { el.textContent = to; return; }
-    const t0 = performance.now();
-    const step = (now) => {
-      const p = Math.min(1, (now - t0) / ms), e = 1 - Math.pow(1 - p, 3);
-      el.textContent = Math.round(from + (to - from) * e);
-      if (p < 1) requestAnimationFrame(step);
-    };
-    requestAnimationFrame(step);
-  }
-  const paintYear = (d) => cells.forEach((c, i) => c.classList.toggle('on', i < d));
-  function calc(animate) {
-    const h = Number(range.value), d = Math.round((h * 365) / 24);
-    const hs = numFmt().format(h);
-    out.textContent = `${hs} h`;
-    how.textContent = fill(t('calc.how'), { h: hs, d });
-    if (animate) animateNumber(days, shown, d, 450); else days.textContent = d;
-    shown = d;
-    if (yearSeen || reduce || !('IntersectionObserver' in window)) paintYear(d);
-  }
-  range.addEventListener('input', () => calc(true));
-  onLang(() => calc(false));
-  if ('IntersectionObserver' in window && !reduce) {
-    const once = new IntersectionObserver((es) => es.forEach((e) => {
-      if (!e.isIntersecting) return;
-      once.disconnect(); yearSeen = true;
-      animateNumber(days, 0, shown, 1500);
-      year.classList.add('intro'); paintYear(shown);
-      setTimeout(() => year.classList.remove('intro'), 2200);
-    }), { threshold: 0.35 });
-    once.observe(year);
-  } else { yearSeen = true; paintYear(shown); }
 
   // ---------- Dades: els números pugen quan es veuen ----------
   function countUp(el) {
@@ -142,35 +100,6 @@
     };
     requestAnimationFrame(step);
   }
-
-  // ---------- Simulador d'avisos ----------
-  const nState = { app: 'Instagram', hours: 2, on: true, msg: 0 };
-  const notif = $('[data-notif]');
-  function radio(group, val) { $$('button', group).forEach((b) => b.setAttribute('aria-checked', String(b.dataset.v === String(val)))); }
-  function renderNudge(pop) {
-    const time = `${nState.hours}h`;
-    $('[data-notif-text]').textContent = fill(t('nudge.msgs')[nState.msg % 8], { app: nState.app, time });
-    $('[data-usage-app]').textContent = nState.app;
-    $('[data-usage-time]').textContent = time;
-    $('[data-usage-fill]').style.width = `${(nState.hours / 3) * 100}%`;
-    notif.hidden = !nState.on; $('[data-notif-off]').hidden = nState.on;
-    if (pop && nState.on && !reduce) { notif.classList.remove('pop'); void notif.offsetWidth; notif.classList.add('pop'); }
-  }
-  const segApp = $('[data-seg-app]'), segHours = $('[data-seg-hours]');
-  $$('button', segApp).forEach((b) => b.addEventListener('click', () => { nState.app = b.dataset.v; radio(segApp, nState.app); renderNudge(true); }));
-  $$('button', segHours).forEach((b) => b.addEventListener('click', () => { nState.hours = Number(b.dataset.v); radio(segHours, nState.hours); renderNudge(true); }));
-  const tog = $('[data-nudge-toggle]');
-  tog.addEventListener('click', () => { nState.on = !nState.on; tog.setAttribute('aria-checked', String(nState.on)); renderNudge(true); });
-  const next = $('[data-nudge-next]');
-  next.addEventListener('click', () => { nState.msg += 1; next.classList.toggle('spin'); renderNudge(true); });
-  onLang(() => { next.setAttribute('aria-label', t('nudge.next')); renderNudge(false); });
-  const clockStr = (tz) => new Intl.DateTimeFormat('ca-ES', { hour: '2-digit', minute: '2-digit', timeZone: tz }).format(new Date());
-  const tickClock = () => {
-    $('[data-lock-time]').textContent = clockStr(undefined);
-    $('[data-clock]').textContent = clockStr('Europe/Madrid');
-  };
-  tickClock(); setInterval(tickClock, 15000);
-  if ('IntersectionObserver' in window) { const ob = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { renderNudge(true); ob.disconnect(); } }), { threshold: 0.5 }); ob.observe(notif); }
 
   // ---------- Paraules en moviment ----------
   const rows = $$('[data-marquee]');
@@ -191,6 +120,7 @@
   const SB_KEY = 'sb_publishable_awxkvjC9sHhdO739ash_Sw_CfmD8nmB';
   const form = $('[data-join]'), segOs = $('[data-seg-os]'), msg = $('[data-join-msg]'), sendBtn = $('[data-join-btn]');
   let os = 'Android';
+  const radio = (group, val) => $$('button', group).forEach((b) => b.setAttribute('aria-checked', String(b.dataset.v === String(val))));
   $$('button', segOs).forEach((b) => b.addEventListener('click', () => { os = b.dataset.v; radio(segOs, os); }));
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -229,12 +159,9 @@
 
   if (!motion) {
     if ('IntersectionObserver' in window) {
-      const ob = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { countUp(e.target); e.target.closest('[data-card]')?.classList.add('play'); } }), { threshold: 0.4 });
+      const ob = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) countUp(e.target); }), { threshold: 0.4 });
       $$('[data-count]').forEach((el) => ob.observe(el));
     }
-    $$('[data-card]').forEach((c) => c.classList.add('play'));
-    // Com funciona sense GSAP: el pas actiu segons el que es veu
-    stepsWithObserver();
     return;
   }
 
@@ -271,14 +198,10 @@
     .from('.hero-p, .hero-actions', { y: 30, opacity: 0, duration: 1.1, stagger: 0.12 }, 0.5)
     .from('.stage', { y: 260, opacity: 0, duration: 1.8 }, 0.25)
     .from('.hero-phone', { '--rx': '48deg', duration: 1.8 }, 0.25)
-    .from('.float-n', { scale: 0.5, opacity: 0, y: 30, duration: 0.9, stagger: 0.18, ease: 'back.out(1.8)' }, 1.1)
     .from('.scroll-cue', { opacity: 0, duration: 1 }, 1.4);
-  // Les notificacions suren
-  $$('.float-n').forEach((n, i) => gsap.to(n, { y: i % 2 ? 14 : -14, rotate: i % 2 ? 1.5 : -1.5, duration: 2.4 + i * 0.4, ease: 'sine.inOut', yoyo: true, repeat: -1, delay: 2 + i * 0.2 }));
-  // En fer scroll: el text puja i es difumina, les notificacions surten volant
+  // En fer scroll: el text puja i es difumina
   gsap.timeline({ scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: 0.6 } })
     .to('[data-hero-copy]', { yPercent: -25, opacity: 0, filter: 'blur(10px)', ease: 'none' }, 0)
-    .to('.float-n', { x: (i) => (i % 2 ? 260 : -260), y: (i) => -160 - i * 60, opacity: 0, scale: 0.8, ease: 'power1.in' }, 0)
     .to('.hero-phone', { '--rx': '0deg', '--ry': '0deg', ease: 'none' }, 0)
     .to('.stage', { scale: 0.92, ease: 'none' }, 0);
   // El mòbil segueix el ratolí
@@ -320,10 +243,8 @@
   const reveals = $$('[data-reveal]');
   gsap.set(reveals, { y: 50, opacity: 0 });
   ScrollTrigger.batch(reveals, { start: 'top 90%', onEnter: (b) => gsap.to(b, { y: 0, opacity: 1, duration: 1.1, ease: 'expo.out', stagger: 0.08 }) });
-  // La xifra gran s'apropa mentre passa
-  gsap.fromTo('.figure', { scale: 0.85 }, { scale: 1, ease: 'none', scrollTrigger: { trigger: '.calc', start: 'top bottom', end: 'center center', scrub: 0.6 } });
 
-  // --- 4. Dades: pista horitzontal fixada (ordinador) o en columna (mòbil) ---
+  // --- 3. Dades: pista horitzontal fixada (ordinador) o en columna (mòbil) ---
   const mm = gsap.matchMedia();
   mm.add('(min-width: 861px)', () => {
     const track = $('[data-track]');
@@ -344,44 +265,12 @@
     });
   });
 
-  // --- 5. Com funciona: el pas actiu canvia la pantalla del mòbil ---
-  const howGrid = $('.how-grid'), howPhone = $('[data-how-phone]'), howVids = $$('[data-how-video]');
-  const setStep = (n) => {
-    howPhone.dataset.at = String(n); howGrid.dataset.at = String(n);
-    $$('.step').forEach((s) => s.classList.toggle('active', s.dataset.step === String(n)));
-    howVids.forEach((v) => { const on = Number(v.dataset.howVideo) === n; if (on) { if (v.dataset.on !== '1') v.currentTime = 0; v.dataset.on = '1'; if (!reduce) v.play().catch(() => {}); } else { v.dataset.on = ''; v.pause(); } });
-  };
-  setStep(1);
-  mm.add('(min-width: 861px)', () => {
-    $$('.step').forEach((s) => ScrollTrigger.create({ trigger: s, start: 'top 60%', end: 'bottom 40%', onToggle: (self) => { if (self.isActive) setStep(Number(s.dataset.step)); } }));
-  });
-  mm.add('(max-width: 860px)', () => {
-    howGrid.classList.add('how-pinned');
-    ScrollTrigger.create({ trigger: howGrid, start: 'top top', end: '+=220%', pin: true, onUpdate: (self) => setStep(1 + Math.min(2, Math.floor(self.progress * 3))) });
-    return () => howGrid.classList.remove('how-pinned');
-  });
-  gsap.from('.how-phone', { y: 120, rotateX: 30, opacity: 0, duration: 1.4, ease: 'expo.out', scrollTrigger: { trigger: '.how-grid', start: 'top 80%' } });
-
-  // --- 6. El panell d'avisos s'inclina en entrar ---
-  gsap.fromTo('.nudge-panel', { rotateX: 18, transformPerspective: 1200 }, { rotateX: 0, ease: 'none', scrollTrigger: { trigger: '.nudge', start: 'top bottom', end: 'center center', scrub: 0.6 } });
-
-  // --- 7. Graella: les peces entren en onada i s'inclinen amb el ratolí ---
-  const cards = $$('[data-card]');
-  gsap.set(cards, { y: 80, opacity: 0, rotateX: 12 });
-  ScrollTrigger.batch(cards, { start: 'top 90%', onEnter: (b) => gsap.to(b, { y: 0, opacity: 1, rotateX: 0, duration: 1.2, ease: 'expo.out', stagger: 0.09 }) });
-  cards.forEach((c) => ScrollTrigger.create({ trigger: c, start: 'top 95%', end: 'bottom 5%', toggleClass: 'play' }));
-  if (fine) cards.forEach((c) => {
-    const rx = gsap.quickTo(c, 'rotateX', { duration: 0.6, ease: 'power3.out' });
-    const ry = gsap.quickTo(c, 'rotateY', { duration: 0.6, ease: 'power3.out' });
-    c.addEventListener('pointermove', (e) => {
-      const r = c.getBoundingClientRect();
-      ry(((e.clientX - r.left) / r.width - 0.5) * 10);
-      rx(-((e.clientY - r.top) / r.height - 0.5) * 10);
-    });
-    c.addEventListener('pointerleave', () => { rx(0); ry(0); });
+  // --- 4. Com funciona: cada mòbil entra inclinat i es posa recte ---
+  $$('.feat .feat-phone .phone').forEach((p) => {
+    gsap.from(p, { y: 90, rotateX: 22, opacity: 0, duration: 1.3, ease: 'expo.out', scrollTrigger: { trigger: p, start: 'top 88%' } });
   });
 
-  // --- 8. Paraules en moviment: més ràpid com més ràpid fas scroll ---
+  // --- 5. Paraules en moviment: més ràpid com més ràpid fas scroll ---
   let vel = 0;
   ScrollTrigger.create({ onUpdate: (self) => { vel = self.getVelocity(); } });
   gsap.ticker.add((_, dt) => {
@@ -397,10 +286,6 @@
     });
   });
 
-  // --- 10. Tancament: el títol creix i la paraula del peu s'obre ---
-  gsap.from('.cta-title', { scale: 0.86, transformOrigin: '0% 100%', ease: 'none', scrollTrigger: { trigger: '.cta', start: 'top bottom', end: 'top 20%', scrub: 0.6 } });
-  gsap.from('[data-foot-word]', { yPercent: 60, letterSpacing: '0.1em', opacity: 0, ease: 'none', scrollTrigger: { trigger: '.foot', start: 'top bottom', end: 'top 40%', scrub: 0.6 } });
-
   // Botons magnètics
   if (fine) $$('[data-magnetic]').forEach((b) => {
     const qx = gsap.quickTo(b, 'x', { duration: 0.5, ease: 'power3.out' }), qy = gsap.quickTo(b, 'y', { duration: 0.5, ease: 'power3.out' });
@@ -410,13 +295,4 @@
 
   // Quan carreguen les lletres, les mides canvien: recalcula
   document.fonts && document.fonts.ready.then(() => ScrollTrigger.refresh());
-
-  function stepsWithObserver() {
-    const grid = $('.how-grid'), ph = $('[data-how-phone]');
-    const set = (n) => { ph.dataset.at = String(n); grid.dataset.at = String(n); $$('.step').forEach((s) => s.classList.toggle('active', s.dataset.step === String(n))); };
-    set(1);
-    if (!('IntersectionObserver' in window)) return;
-    const ob = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) set(Number(e.target.dataset.step)); }), { rootMargin: '-45% 0px -45% 0px' });
-    $$('.step').forEach((s) => ob.observe(s));
-  }
 })();

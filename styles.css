@@ -544,3 +544,51 @@ button { cursor: pointer; }
 .scr.scr-v { padding: 0; zoom: 1; }
 .how-phone .scr.scr-v { padding: 0; zoom: 1; }
 .phone-screen { padding: 0; }
+
+/* ============ Versió minimalista ============ */
+/* Cómo funciona: una fila per funció, amb el mòbil de veritat al costat del text */
+.how-head { margin-bottom: clamp(8px, 3vh, 36px); }
+.feats { display: grid; gap: clamp(24px, 6vh, 80px); margin-top: 24px; }
+.feat { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: center; gap: clamp(32px, 6vw, 120px); min-height: 78svh; }
+.feat:nth-child(even) .feat-phone { order: 2; }
+.feat-phone { display: grid; place-items: center; perspective: 1400px; }
+.feat .phone { width: min(320px, 74vw); }
+.feat-copy { display: grid; gap: 18px; max-width: 36ch; justify-self: start; }
+.feat:nth-child(even) .feat-copy { justify-self: end; }
+.feat-p { font-size: clamp(17px, 1.5vw, 21px); line-height: 1.5; color: var(--muted); }
+
+/* Uneix-te a les proves: negre, sense el bloc groc */
+.cta { background: #000; color: var(--ink); min-height: 0; padding: clamp(88px, 14vh, 150px) var(--margin); margin-top: var(--gap-section); }
+.cta-title { font-size: clamp(56px, 9vw, 150px); }
+.cta-copy > p { color: var(--muted); }
+.dialog { background: var(--surface); color: var(--ink); box-shadow: 0 0 0 1px var(--line); }
+.dialog label { color: var(--muted); }
+.dialog input[type=email] { background: #000; border-color: #34343A; color: var(--ink); }
+.dialog input[type=email]:focus { border-color: #D8A93A; }
+.dialog input[type=email]:focus-visible { outline-color: #D8A93A; }
+.dialog .btn-dark { background: var(--gold-grad); color: var(--on-accent); }
+.dialog .btn-dark:hover { filter: brightness(1.08); background: var(--gold-grad); }
+.seg-light { background: #000; }
+.seg-light button { color: var(--muted); }
+.seg-light button[aria-checked="true"] { background: var(--ink); color: var(--bg); }
+.form-msg { color: #FF9C8F; }
+.form-msg.sending { color: var(--muted); }
+.dialog-done p:last-child { color: var(--muted); }
+.dialog .win-check circle, .dialog .win-check path { stroke: url(#goldG); }
+
+/* Peu mínim: només privacitat i contacte */
+.foot-min { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 18px 32px; padding: 28px var(--margin) 40px; border-top: 1px solid var(--line); font-size: 15px; color: var(--muted); }
+.foot-min .foot-word { font-size: 22px; font-weight: 800; letter-spacing: -0.03em; color: var(--ink); }
+.foot-min .foot-word b { background: var(--gold-grad); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent; }
+.foot-min nav { display: flex; flex-wrap: wrap; gap: 8px 24px; }
+.foot-min a { color: var(--ink); text-decoration: none; font-weight: 600; overflow-wrap: anywhere; }
+.foot-min a:hover { text-decoration: underline; text-underline-offset: 4px; }
+
+@media (max-width: 860px) {
+  .feat { grid-template-columns: 1fr; min-height: 0; gap: 26px; justify-items: center; text-align: center; padding: 30px 0; }
+  .feat:nth-child(even) .feat-phone { order: 0; }
+  .feat .phone { width: min(260px, 68vw); }
+  .feat-copy, .feat:nth-child(even) .feat-copy { justify-self: center; justify-items: center; }
+  .cta { grid-template-columns: 1fr; }
+  .dialog { justify-self: stretch; }
+}
