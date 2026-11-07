@@ -144,6 +144,26 @@
     }
   });
 
+  // ---------- Funcions: títols en llista; en clicar-ne un s'obre el detall i el seu vídeo ----------
+  const fxRows = $$('.fx-row'), fxVids = $$('[data-fxv]'), fxStage = $('.fx-stage');
+  let fxVisible = false;
+  function fxSelect(i) {
+    fxRows.forEach((r, k) => { r.classList.toggle('open', k === i); $('.fx-item', r).setAttribute('aria-expanded', String(k === i)); });
+    fxVids.forEach((v, k) => {
+      v.classList.toggle('on', k === i);
+      if (k === i) { v.currentTime = 0; if (fxVisible && !reduce) v.play().catch(() => {}); } else v.pause();
+    });
+    if (motion) setTimeout(() => ScrollTrigger.refresh(), 650);
+  }
+  $$('.fx-item').forEach((b) => b.addEventListener('click', () => { if (!b.closest('.fx-row').classList.contains('open')) fxSelect(Number(b.dataset.fx)); }));
+  if (fxStage && 'IntersectionObserver' in window) {
+    new IntersectionObserver((es) => es.forEach((e) => {
+      fxVisible = e.isIntersecting;
+      const v = $('[data-fxv].on');
+      if (v && !reduce) { if (fxVisible) v.play().catch(() => {}); else v.pause(); }
+    }), { threshold: 0.25 }).observe(fxStage);
+  }
+
   // Mentre es forma, el logo està al centre de la pantalla; quan surt el text, puja al seu lloc.
   const mark = $('.hero-mark'), heroCopy = $('[data-hero-copy]');
   const setShift = () => {
@@ -163,6 +183,8 @@
   addEventListener('scroll', () => top.classList.toggle('scrolled', scrollY > 30), { passive: true });
 
   if (!motion) {
+    $$('.tl').forEach((li) => li.classList.add('on'));
+    $('[data-timeline]').style.setProperty('--p', '1');
     if ('IntersectionObserver' in window) {
       const ob = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) countUp(e.target); }), { threshold: 0.4 });
       $$('[data-count]').forEach((el) => ob.observe(el));
@@ -224,25 +246,18 @@
   gsap.set(reveals, { y: 50, opacity: 0 });
   ScrollTrigger.batch(reveals, { start: 'top 90%', onEnter: (b) => gsap.to(b, { y: 0, opacity: 1, duration: 1.1, ease: 'expo.out', stagger: 0.08 }) });
 
-  // --- 3. Dades: pista horitzontal fixada (ordinador) o en columna (mòbil) ---
-  const mm = gsap.matchMedia();
-  mm.add('(min-width: 861px)', () => {
-    const track = $('[data-track]');
-    const dist = () => track.scrollWidth - innerWidth;
-    const h = gsap.to(track, {
-      x: () => -dist(), ease: 'none',
-      scrollTrigger: { trigger: '[data-data-pin]', start: 'top top', end: () => `+=${dist()}`, pin: true, scrub: 0.8, invalidateOnRefresh: true },
-    });
-    $$('.stat').forEach((card) => {
-      gsap.from(card, { rotate: 4, y: 60, opacity: 0.3, ease: 'none', scrollTrigger: { trigger: card, containerAnimation: h, start: 'left 100%', end: 'left 55%', scrub: true } });
-      ScrollTrigger.create({ trigger: card, containerAnimation: h, start: 'left 75%', onEnter: () => countUp($('[data-count]', card)) });
-    });
-  });
-  mm.add('(max-width: 860px)', () => {
-    $$('.stat').forEach((card) => {
-      gsap.from(card, { y: 60, opacity: 0, duration: 1, ease: 'expo.out', scrollTrigger: { trigger: card, start: 'top 88%' } });
-      ScrollTrigger.create({ trigger: card, start: 'top 75%', onEnter: () => countUp($('[data-count]', card)) });
-    });
+  // --- 3. Dades: la línia s'omple mentre baixes i cada cercle s'encén amb la seva dada ---
+  const tlEl = $('[data-timeline]'), dots = $$('.tl', tlEl);
+  ScrollTrigger.create({
+    trigger: tlEl, start: 'top 78%', end: 'bottom 62%', scrub: 0.5,
+    onUpdate: (self) => {
+      tlEl.style.setProperty('--p', self.progress.toFixed(3));
+      dots.forEach((li, i) => {
+        const on = self.progress >= i / dots.length + 0.02;
+        if (on && !li.classList.contains('on')) { li.classList.add('on'); countUp($('[data-count]', li)); }
+        else if (!on && li.classList.contains('on')) li.classList.remove('on');
+      });
+    },
   });
 
   // --- 5. Paraules en moviment: més ràpid com més ràpid fas scroll ---

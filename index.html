@@ -84,16 +84,16 @@
 
 <!-- 4. Les dades, en una pista horitzontal -->
 <section class="data" aria-labelledby="data-title">
-  <div class="data-pin" data-data-pin>
+  <div class="data-wrap">
     <div class="data-head">
       <p class="kicker" data-i18n="data.k">Les dades</p>
       <h2 id="data-title" class="h2" data-split data-i18n="data.h">No et passa només a tu.</h2>
     </div>
-    <ol class="data-track" data-track>
-      <li class="stat"><p class="stat-n" data-count data-i18n="data.1n">1 de cada 3</p><p class="stat-t" data-i18n="data.1t">adolescents a Espanya fa un ús problemàtic d’internet i de les xarxes.</p><a class="stat-s" href="https://www.unicef.es/publicacion/impacto-de-la-tecnologia-en-la-adolescencia" data-i18n="data.1s">UNICEF Espanya, 2021</a></li>
-      <li class="stat"><p class="stat-n" data-count data-i18n="data.2n">+100</p><p class="stat-t" data-i18n="data.2t">vegades al dia mira el mòbil un adolescent, de mitjana.</p><a class="stat-s" href="https://www.commonsensemedia.org/press-releases/teens-are-bombarded-with-hundreds-of-notifications-a-day" data-i18n="data.2s">Common Sense Media, 2023</a></li>
-      <li class="stat stat-gold"><p class="stat-n" data-count data-i18n="data.3n">237</p><p class="stat-t" data-i18n="data.3t">notificacions al dia o més rep la meitat dels joves.</p><a class="stat-s" href="https://www.commonsensemedia.org/press-releases/teens-are-bombarded-with-hundreds-of-notifications-a-day" data-i18n="data.3s">Common Sense Media, 2023</a></li>
-      <li class="stat"><p class="stat-n" data-count data-i18n="data.4n">+2/3</p><p class="stat-t" data-i18n="data.4t">dels joves diuen que, a vegades o sovint, els costa deixar el mòbil.</p><a class="stat-s" href="https://www.commonsensemedia.org/press-releases/teens-are-bombarded-with-hundreds-of-notifications-a-day" data-i18n="data.4s">Common Sense Media, 2023</a></li>
+    <ol class="timeline" data-timeline>
+      <li class="tl"><i class="tl-dot" aria-hidden="true"></i><p class="stat-n" data-count data-i18n="data.1n">1 de cada 3</p><p class="stat-t" data-i18n="data.1t">adolescents a Espanya fa un ús problemàtic d’internet i de les xarxes.</p><a class="stat-s" href="https://www.unicef.es/publicacion/impacto-de-la-tecnologia-en-la-adolescencia" data-i18n="data.1s">UNICEF Espanya, 2021</a></li>
+      <li class="tl"><i class="tl-dot" aria-hidden="true"></i><p class="stat-n" data-count data-i18n="data.2n">+100</p><p class="stat-t" data-i18n="data.2t">vegades al dia mira el mòbil un adolescent, de mitjana.</p><a class="stat-s" href="https://www.commonsensemedia.org/press-releases/teens-are-bombarded-with-hundreds-of-notifications-a-day" data-i18n="data.2s">Common Sense Media, 2023</a></li>
+      <li class="tl"><i class="tl-dot" aria-hidden="true"></i><p class="stat-n" data-count data-i18n="data.3n">237</p><p class="stat-t" data-i18n="data.3t">notificacions al dia o més rep la meitat dels joves.</p><a class="stat-s" href="https://www.commonsensemedia.org/press-releases/teens-are-bombarded-with-hundreds-of-notifications-a-day" data-i18n="data.3s">Common Sense Media, 2023</a></li>
+      <li class="tl"><i class="tl-dot" aria-hidden="true"></i><p class="stat-n" data-count data-i18n="data.4n">+2/3</p><p class="stat-t" data-i18n="data.4t">dels joves diuen que, a vegades o sovint, els costa deixar el mòbil.</p><a class="stat-s" href="https://www.commonsensemedia.org/press-releases/teens-are-bombarded-with-hundreds-of-notifications-a-day" data-i18n="data.4s">Common Sense Media, 2023</a></li>
     </ol>
   </div>
 </section>
@@ -104,68 +104,54 @@
     <p class="kicker" data-i18n="how.k">Tot el que fa</p>
     <h2 id="how-title" class="h2" data-split data-i18n="how.h">Funcions de scrolloff</h2>
   </div>
-  <div class="fns">
-    <article class="fn" data-reveal>
-      <div class="fn-copy">
-        <span class="fn-n">01</span>
-        <h3 class="fn-h" data-i18n="fn.1">Funció 1</h3>
-        <p class="fn-p" data-i18n="how.1t"></p>
-      </div>
-      <div class="fn-phone"><div class="phone"><div class="phone-screen"><div class="island" aria-hidden="true"></div>
-        <video class="real-video" data-video="loop" src="media/how-1.mp4" poster="media/how-1.jpg" width="480" height="1040" muted loop playsinline preload="metadata" aria-hidden="true"></video>
+  <div class="fx" data-fx-root>
+      <ul class="fx-list">
+        <li class="fx-row open">
+          <button type="button" class="fx-item" id="fx-b1" aria-expanded="true" aria-controls="fx-p1" data-fx="0">
+            <span class="fn-n">01</span><span class="fx-t" data-i18n="fn.1">Funció 1</span><span class="fx-plus" aria-hidden="true"></span>
+          </button>
+          <div class="fx-body" id="fx-p1" role="region" aria-labelledby="fx-b1"><div><p class="fx-d" data-i18n="how.1t"></p></div></div>
+        </li>
+        <li class="fx-row">
+          <button type="button" class="fx-item" id="fx-b2" aria-expanded="false" aria-controls="fx-p2" data-fx="1">
+            <span class="fn-n">02</span><span class="fx-t" data-i18n="fn.2">Funció 2</span><span class="fx-plus" aria-hidden="true"></span>
+          </button>
+          <div class="fx-body" id="fx-p2" role="region" aria-labelledby="fx-b2"><div><p class="fx-d" data-i18n="how.2t"></p></div></div>
+        </li>
+        <li class="fx-row">
+          <button type="button" class="fx-item" id="fx-b3" aria-expanded="false" aria-controls="fx-p3" data-fx="2">
+            <span class="fn-n">03</span><span class="fx-t" data-i18n="fn.3">Funció 3</span><span class="fx-plus" aria-hidden="true"></span>
+          </button>
+          <div class="fx-body" id="fx-p3" role="region" aria-labelledby="fx-b3"><div><p class="fx-d" data-i18n="how.3t"></p></div></div>
+        </li>
+        <li class="fx-row">
+          <button type="button" class="fx-item" id="fx-b4" aria-expanded="false" aria-controls="fx-p4" data-fx="3">
+            <span class="fn-n">04</span><span class="fx-t" data-i18n="fn.4">Funció 4</span><span class="fx-plus" aria-hidden="true"></span>
+          </button>
+          <div class="fx-body" id="fx-p4" role="region" aria-labelledby="fx-b4"><div><p class="fx-d" data-i18n="how.4t"></p></div></div>
+        </li>
+        <li class="fx-row">
+          <button type="button" class="fx-item" id="fx-b5" aria-expanded="false" aria-controls="fx-p5" data-fx="4">
+            <span class="fn-n">05</span><span class="fx-t" data-i18n="fn.5">Funció 5</span><span class="fx-plus" aria-hidden="true"></span>
+          </button>
+          <div class="fx-body" id="fx-p5" role="region" aria-labelledby="fx-b5"><div><p class="fx-d" data-i18n="how.5t"></p></div></div>
+        </li>
+        <li class="fx-row">
+          <button type="button" class="fx-item" id="fx-b6" aria-expanded="false" aria-controls="fx-p6" data-fx="5">
+            <span class="fn-n">06</span><span class="fx-t" data-i18n="fn.6">Funció 6</span><span class="fx-plus" aria-hidden="true"></span>
+          </button>
+          <div class="fx-body" id="fx-p6" role="region" aria-labelledby="fx-b6"><div><p class="fx-d" data-i18n="how.6t"></p></div></div>
+        </li>
+      </ul>
+      <div class="fx-stage"><div class="phone"><div class="phone-screen"><div class="island" aria-hidden="true"></div>
+          <video class="real-video on" data-fxv="0" src="media/how-1.mp4" poster="media/how-1.jpg" width="480" height="1040" muted loop playsinline preload="auto" aria-hidden="true"></video>
+          <video class="real-video" data-fxv="1" src="media/how-2.mp4" poster="media/how-2.jpg" width="480" height="1040" muted loop playsinline preload="metadata" aria-hidden="true"></video>
+          <video class="real-video" data-fxv="2" src="media/how-3.mp4" poster="media/how-3.jpg" width="480" height="1040" muted loop playsinline preload="metadata" aria-hidden="true"></video>
+          <video class="real-video" data-fxv="3" src="media/how-4.mp4" poster="media/how-4.jpg" width="480" height="1040" muted loop playsinline preload="metadata" aria-hidden="true"></video>
+          <video class="real-video" data-fxv="4" src="media/how-5.mp4" poster="media/how-5.jpg" width="480" height="1040" muted loop playsinline preload="metadata" aria-hidden="true"></video>
+          <video class="real-video" data-fxv="5" src="media/how-6.mp4" poster="media/how-6.jpg" width="480" height="1040" muted loop playsinline preload="metadata" aria-hidden="true"></video>
       </div></div></div>
-    </article>
-    <article class="fn" data-reveal>
-      <div class="fn-copy">
-        <span class="fn-n">02</span>
-        <h3 class="fn-h" data-i18n="fn.2">Funció 2</h3>
-        <p class="fn-p" data-i18n="how.2t"></p>
-      </div>
-      <div class="fn-phone"><div class="phone"><div class="phone-screen"><div class="island" aria-hidden="true"></div>
-        <video class="real-video" data-video="loop" src="media/how-2.mp4" poster="media/how-2.jpg" width="480" height="1040" muted loop playsinline preload="metadata" aria-hidden="true"></video>
-      </div></div></div>
-    </article>
-    <article class="fn" data-reveal>
-      <div class="fn-copy">
-        <span class="fn-n">03</span>
-        <h3 class="fn-h" data-i18n="fn.3">Funció 3</h3>
-        <p class="fn-p" data-i18n="how.3t"></p>
-      </div>
-      <div class="fn-phone"><div class="phone"><div class="phone-screen"><div class="island" aria-hidden="true"></div>
-        <video class="real-video" data-video="loop" src="media/how-3.mp4" poster="media/how-3.jpg" width="480" height="1040" muted loop playsinline preload="metadata" aria-hidden="true"></video>
-      </div></div></div>
-    </article>
-    <article class="fn" data-reveal>
-      <div class="fn-copy">
-        <span class="fn-n">04</span>
-        <h3 class="fn-h" data-i18n="fn.4">Funció 4</h3>
-        <p class="fn-p" data-i18n="how.4t"></p>
-      </div>
-      <div class="fn-phone"><div class="phone"><div class="phone-screen"><div class="island" aria-hidden="true"></div>
-        <video class="real-video" data-video="loop" src="media/how-4.mp4" poster="media/how-4.jpg" width="480" height="1040" muted loop playsinline preload="metadata" aria-hidden="true"></video>
-      </div></div></div>
-    </article>
-    <article class="fn" data-reveal>
-      <div class="fn-copy">
-        <span class="fn-n">05</span>
-        <h3 class="fn-h" data-i18n="fn.5">Funció 5</h3>
-        <p class="fn-p" data-i18n="how.5t"></p>
-      </div>
-      <div class="fn-phone"><div class="phone"><div class="phone-screen"><div class="island" aria-hidden="true"></div>
-        <video class="real-video" data-video="loop" src="media/how-5.mp4" poster="media/how-5.jpg" width="480" height="1040" muted loop playsinline preload="metadata" aria-hidden="true"></video>
-      </div></div></div>
-    </article>
-    <article class="fn" data-reveal>
-      <div class="fn-copy">
-        <span class="fn-n">06</span>
-        <h3 class="fn-h" data-i18n="fn.6">Funció 6</h3>
-        <p class="fn-p" data-i18n="how.6t"></p>
-      </div>
-      <div class="fn-phone"><div class="phone"><div class="phone-screen"><div class="island" aria-hidden="true"></div>
-        <video class="real-video" data-video="loop" src="media/how-6.mp4" poster="media/how-6.jpg" width="480" height="1040" muted loop playsinline preload="metadata" aria-hidden="true"></video>
-      </div></div></div>
-    </article>
-  </div>
+    </div>
 </section>
 
 <!-- 8. Per a què és el temps que recuperes: paraules gegants en moviment -->

@@ -584,25 +584,62 @@ button { cursor: pointer; }
   .dialog { justify-self: stretch; }
 }
 
-/* ============ Funcions: un bloc per cada cosa que fa l'app ============ */
+/* ============ Dades: una línia amb un cercle per cada dada ============ */
+.data { margin-top: var(--gap-section); }
+.data-wrap { padding: 0 var(--margin); }
+.data-head { text-align: center; }
+.data-head .h2 { max-width: 14ch; margin-inline: auto; text-wrap: balance; }
+.timeline { --p: 0; position: relative; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: clamp(20px, 3vw, 48px); margin-top: clamp(48px, 8vh, 96px); }
+.timeline::before, .timeline::after { content: ""; position: absolute; left: 0; right: 0; top: 10px; height: 2px; background: var(--line); }
+.timeline::after { background: var(--gold-grad); transform: scaleX(var(--p)); transform-origin: 0 50%; }
+.tl { position: relative; padding-top: 52px; display: grid; gap: 14px; align-content: start; }
+.tl-dot { position: absolute; left: 0; top: 0; z-index: 1; width: 22px; height: 22px; border-radius: 50%; background: var(--bg); border: 2px solid var(--line); transition: background .5s var(--ease-out), border-color .5s, box-shadow .6s, transform .6s var(--ease-spring); }
+.tl.on .tl-dot { background: var(--gold-grad); border-color: transparent; box-shadow: 0 0 0 7px rgba(237,190,69,.14), 0 0 28px rgba(237,190,69,.45); transform: scale(1.12); }
+.tl .stat-n { font-size: clamp(44px, 5.6vw, 96px); font-weight: 900; line-height: .92; letter-spacing: -0.055em; background: var(--gold-grad); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent; font-variant-numeric: tabular-nums; }
+.tl .stat-t { font-size: clamp(17px, 1.5vw, 21px); line-height: 1.4; font-weight: 600; max-width: 24ch; }
+.tl .stat-s { font-size: 14px; color: var(--muted); text-underline-offset: 4px; text-decoration-color: rgba(169,166,157,.4); }
+.tl:not(.on) .stat-n, .tl:not(.on) .stat-t, .tl:not(.on) .stat-s { opacity: .28; }
+.tl .stat-n, .tl .stat-t, .tl .stat-s { transition: opacity .7s var(--ease-out); }
+
+@media (max-width: 860px) {
+  .timeline { grid-template-columns: 1fr; gap: 44px; padding-left: 8px; }
+  .timeline::before, .timeline::after { left: 10px; right: auto; top: 0; bottom: 0; width: 2px; height: auto; }
+  .timeline::after { transform: scaleY(var(--p)); transform-origin: 50% 0; }
+  .tl { padding: 0 0 0 52px; }
+  .tl-dot { top: 6px; left: 0; }
+}
+
+/* ============ Funcions: llista de títols; en clicar-ne un s'obre el detall i el seu mòbil ============ */
 .how-head { text-align: center; margin-bottom: clamp(28px, 5vh, 56px); }
 .how-head .h2 { max-width: 14ch; margin-inline: auto; text-wrap: balance; }
-.fns { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(12px, 1.4vw, 20px); }
-.fn { position: relative; display: flex; flex-direction: column; overflow: hidden; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: clamp(24px, 2.4vw, 36px) clamp(24px, 2.4vw, 36px) 0; }
-.fn-copy { display: grid; gap: 12px; align-content: start; }
-.fn-n { font-size: 14px; font-weight: 800; background: var(--gold-grad); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent; font-variant-numeric: tabular-nums; }
-.fn-h { font-size: clamp(26px, 2.3vw, 36px); font-weight: 800; line-height: 1.05; letter-spacing: -0.035em; }
-.fn-p { font-size: 17px; line-height: 1.5; color: var(--muted); max-width: 34ch; }
-.fn-phone { margin-top: auto; padding-top: 28px; display: grid; justify-items: center; height: 330px; overflow: hidden; }
-.fn-phone .phone { width: min(230px, 64%); flex: none; }
-.fn:hover .phone { transform: translateY(-6px); }
+.fx { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: clamp(32px, 6vw, 110px); align-items: center; }
+.fx-list { border-bottom: 1px solid var(--line); }
+.fx-row { border-top: 1px solid var(--line); }
+.fx-item { width: 100%; display: grid; grid-template-columns: 34px 1fr auto; align-items: center; gap: 12px; text-align: left; background: none; border: 0; padding: clamp(18px, 2.6vh, 28px) 0; color: var(--ink); }
+.fx-t { font-size: clamp(26px, 3.1vw, 48px); font-weight: 800; letter-spacing: -0.04em; line-height: 1.04; opacity: .42; transition: opacity .4s var(--ease-out), transform .5s var(--ease-out); }
+.fx-item:hover .fx-t { opacity: .8; }
+.fx-row.open .fx-t { opacity: 1; }
+.fx-plus { position: relative; width: 22px; height: 22px; opacity: .6; transition: transform .5s var(--ease-out); }
+.fx-plus::before, .fx-plus::after { content: ""; position: absolute; left: 0; right: 0; top: 50%; height: 2px; margin-top: -1px; background: currentColor; border-radius: 2px; }
+.fx-plus::after { transform: rotate(90deg); transition: transform .5s var(--ease-out); }
+.fx-row.open .fx-plus { transform: rotate(180deg); opacity: 1; }
+.fx-row.open .fx-plus::after { transform: rotate(0); }
+.fx-body { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .55s var(--ease-out); }
+.fx-body > div { overflow: hidden; }
+.fx-row.open .fx-body { grid-template-rows: 1fr; }
+.fx-d { padding: 0 0 clamp(20px, 3vh, 32px) 46px; font-size: clamp(17px, 1.5vw, 21px); line-height: 1.5; color: var(--muted); max-width: 40ch; }
+.fx-stage { display: grid; place-items: center; position: sticky; top: 90px; align-self: start; }
+.fx-stage .phone { width: min(310px, 70vw); }
+.fx-stage .real-video { opacity: 0; transition: opacity .55s var(--ease-out); }
+.fx-stage .real-video.on { opacity: 1; }
 .phone { transition: transform .6s var(--ease-out); }
 
-@media (max-width: 1100px) { .fns { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-@media (max-width: 680px) {
-  .fns { grid-template-columns: 1fr; }
-  .fn { min-height: 0; }
-  .fn-phone .phone { width: min(230px, 62%); }
+@media (max-width: 860px) {
+  .fx { grid-template-columns: 1fr; gap: 32px; }
+  .fx-stage { order: -1; position: static; }
+  .fx-stage .phone { width: min(230px, 62vw); }
+  .fx-d { padding-left: 0; }
+  .fx-item { grid-template-columns: 30px 1fr auto; }
 }
 
 /* ============ Peu: scrolloff gegant ============ */
