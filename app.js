@@ -168,7 +168,7 @@
   const mark = $('.hero-mark'), heroCopy = $('[data-hero-copy]');
   const setShift = () => {
     if (!mark || !heroCopy) return;
-    mark.style.setProperty('--shift', Math.max(0, (heroCopy.offsetHeight - mark.getBoundingClientRect().height) / 2) + 'px');
+    mark.style.setProperty('--shift', Math.max(0, (heroCopy.offsetHeight - parseFloat(getComputedStyle(mark).height)) / 2) + 'px');
   };
   listeners.push(setShift);
   addEventListener('resize', setShift);
