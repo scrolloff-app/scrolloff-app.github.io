@@ -9,22 +9,17 @@
   const motion = !reduce && !!(window.gsap && window.ScrollTrigger);
   document.documentElement.classList.remove('no-js');
 
-  // ---------- Intro del logo (CSS); es pot saltar amb un clic, una tecla o fent scroll ----------
-  const introEl = $('[data-intro]');
+  // ---------- El logo es forma dins del hero (CSS, 4 s). No es pot saltar: la pàgina queda quieta fins que acaba ----------
   let introOn = document.documentElement.classList.contains('has-intro');
   const afterIntro = [];
   const whenIntroEnds = (fn) => (introOn ? afterIntro.push(fn) : fn());
-  function endIntro(skipped) {
-    if (!introOn) return;
-    introOn = false;
-    clearTimeout(window.__introEnd);
-    const finish = () => { document.documentElement.classList.remove('has-intro'); afterIntro.splice(0).forEach((fn) => fn(skipped)); };
-    if (skipped) { introEl.classList.add('skipped'); setTimeout(finish, 350); } else finish();
-  }
   if (introOn) {
-    setTimeout(() => endIntro(false), 2850);
-    const skip = () => endIntro(true);
-    ['pointerdown', 'keydown', 'wheel', 'touchstart'].forEach((ev) => addEventListener(ev, skip, { once: true, passive: true }));
+    setTimeout(() => {
+      introOn = false;
+      clearTimeout(window.__introEnd);
+      document.documentElement.classList.remove('has-intro');
+      afterIntro.splice(0).forEach((fn) => fn());
+    }, 4600);
   }
 
   // ---------- Idioma ----------
@@ -149,6 +144,16 @@
     }
   });
 
+  // Mentre es forma, el logo està al centre de la pantalla; quan surt el text, puja al seu lloc.
+  const mark = $('.hero-mark'), heroCopy = $('[data-hero-copy]');
+  const setShift = () => {
+    if (!mark || !heroCopy) return;
+    mark.style.setProperty('--shift', Math.max(0, (heroCopy.offsetHeight - mark.getBoundingClientRect().height) / 2) + 'px');
+  };
+  listeners.push(setShift);
+  addEventListener('resize', setShift);
+  document.fonts && document.fonts.ready.then(setShift);
+
   applyLang();
 
   // ====================================================================
@@ -188,34 +193,9 @@
   // Barra de progrés
   gsap.to('[data-progress]', { scaleX: 1, ease: 'none', scrollTrigger: { start: 0, end: 'max', scrub: 0.3 } });
 
-  // --- 1. Entrada del hero ---
-  // Amb la intro, el hero comença just quan puja la persiana (o de seguida si se la salten).
-  const intro = gsap.timeline({ defaults: { ease: 'expo.out' }, delay: introOn ? 2.2 : 0 });
-  whenIntroEnds((skipped) => { if (skipped) intro.delay(0.1); });
-  intro
-    .from('.hero .kicker', { y: 20, opacity: 0, duration: 1 })
-    .from('.hero-title .wi', { yPercent: 115, duration: 1.3, stagger: 0.08 }, 0.1)
-    .from('.hero-p, .hero-actions', { y: 30, opacity: 0, duration: 1.1, stagger: 0.12 }, 0.5)
-    .from('.stage', { y: 260, opacity: 0, duration: 1.8 }, 0.25)
-    .from('.hero-phone', { '--rx': '48deg', duration: 1.8 }, 0.25)
-    .from('.scroll-cue', { opacity: 0, duration: 1 }, 1.4);
-  // En fer scroll: el text puja i es difumina
+  // --- 1. Hero: l'entrada és CSS (logo + titular); en fer scroll, el text puja i es difumina ---
   gsap.timeline({ scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: 0.6 } })
-    .to('[data-hero-copy]', { yPercent: -25, opacity: 0, filter: 'blur(10px)', ease: 'none' }, 0)
-    .to('.hero-phone', { '--rx': '0deg', '--ry': '0deg', ease: 'none' }, 0)
-    .to('.stage', { scale: 0.92, ease: 'none' }, 0);
-  // El mòbil segueix el ratolí
-  const phone = $('[data-tilt]');
-  if (fine && phone) {
-    const qx = gsap.quickTo(phone, '--ry', { duration: 0.8, ease: 'power3.out', unit: 'deg' });
-    const qy = gsap.quickTo(phone, '--rx', { duration: 0.8, ease: 'power3.out', unit: 'deg' });
-    $('.hero').addEventListener('pointermove', (e) => {
-      if (scrollY > innerHeight * 0.3) return;
-      const r = innerWidth, h = innerHeight;
-      qx(-16 + ((e.clientX / r) - 0.5) * 22);
-      qy(8 - ((e.clientY / h) - 0.5) * 16);
-    });
-  }
+    .to('[data-hero-copy]', { yPercent: -25, opacity: 0, filter: 'blur(10px)', ease: 'none' }, 0);
 
   // --- 2. La frase s'il·lumina paraula a paraula (secció fixada) ---
   // Un sol ScrollTrigger fix per a tota la vida de la pàgina: si es tornés a crear en
@@ -263,11 +243,6 @@
       gsap.from(card, { y: 60, opacity: 0, duration: 1, ease: 'expo.out', scrollTrigger: { trigger: card, start: 'top 88%' } });
       ScrollTrigger.create({ trigger: card, start: 'top 75%', onEnter: () => countUp($('[data-count]', card)) });
     });
-  });
-
-  // --- 4. Com funciona: cada mòbil entra inclinat i es posa recte ---
-  $$('.feat .feat-phone .phone').forEach((p) => {
-    gsap.from(p, { y: 90, rotateX: 22, opacity: 0, duration: 1.3, ease: 'expo.out', scrollTrigger: { trigger: p, start: 'top 88%' } });
   });
 
   // --- 5. Paraules en moviment: més ràpid com més ràpid fas scroll ---

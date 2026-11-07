@@ -19,34 +19,20 @@
 <link rel="icon" href="img/favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800;900&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800;900&family=Open+Sans:wght@300;400;800&display=swap">
 <link rel="stylesheet" href="styles.css">
 <script>
-  // Intro amb el logo, com la de l'app. Es treu sola encara que app.js no carregui.
+  // El logo es forma dins del hero (4 s) i la pàgina no es pot moure fins que acaba.
   (function () {
     try { if (matchMedia('(prefers-reduced-motion: reduce)').matches) return; } catch (e) { return; }
     var html = document.documentElement;
     html.classList.add('has-intro');
-    window.__introEnd = setTimeout(function () { html.classList.remove('has-intro'); }, 2900);
+    window.__introEnd = setTimeout(function () { html.classList.remove('has-intro'); }, 4600);
   })();
 </script>
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs><linearGradient id="goldG" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFEDB3"/><stop offset=".45" stop-color="#EDBE45"/><stop offset="1" stop-color="#C98F26"/></linearGradient></defs></svg>
-<div class="intro" data-intro aria-hidden="true">
-  <div class="intro-lock">
-    <svg class="intro-mark" viewBox="0 0 100 100">
-      <defs>
-        <linearGradient id="ig-l" x1="0" x2="1"><stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#B9B8B4"/></linearGradient>
-        <linearGradient id="ig-r" x1="0" x2="1"><stop offset="0" stop-color="#B9B8B4"/><stop offset="1" stop-color="#6A6A6E"/></linearGradient>
-      </defs>
-      <circle class="im-c" cx="50" cy="50" r="47.4"/>
-      <path class="im-r" d="M66 8.5 Q69.9 43.77 92 50 Q69.9 56.23 66 91.5 Q59.5 60.38 40 50 Q59.5 39.63 66 8.5Z" fill="url(#ig-r)"/>
-      <path class="im-l" d="M34 8.5 Q40.5 39.63 60 50 Q40.5 60.38 34 91.5 Q30.1 56.23 8 50 Q30.1 43.77 34 8.5Z" fill="url(#ig-l)"/>
-    </svg>
-    <p class="intro-name">scroll<b>off</b></p>
-  </div>
-</div>
 <a class="skip" href="#main" data-i18n="skip">Salta al contingut</a>
 <div class="progress" aria-hidden="true"><span data-progress></span></div>
 
@@ -68,28 +54,27 @@
 
 <main id="main">
 
-<!-- 1. Hero: el titular puja paraula a paraula i el mòbil, amb l'Xcape de veritat -->
+<!-- 1. Hero: el logo es forma sol (4 s) i després apareix el titular, tot centrat -->
 <section class="hero" aria-labelledby="hero-title">
   <div class="hero-copy" data-hero-copy>
-    <p class="kicker" data-i18n="hero.kicker">Una app per a Android · Gratis</p>
-    <h1 id="hero-title" class="hero-title" data-split data-i18n="hero.h1b">Recupera el teu temps.</h1>
-    <p class="hero-p" data-i18n="hero.p">Una pausa abans del scroll: ScrollOff t’atura un segon abans d’obrir TikTok, Instagram o YouTube. En aquell segon, decideixes tu.</p>
-    <div class="hero-actions">
+    <svg class="hero-mark" viewBox="0 0 100 100" aria-hidden="true" focusable="false">
+      <defs>
+        <linearGradient id="ig-l" x1="0" x2="1"><stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#B9B8B4"/></linearGradient>
+        <linearGradient id="ig-r" x1="0" x2="1"><stop offset="0" stop-color="#B9B8B4"/><stop offset="1" stop-color="#6A6A6E"/></linearGradient>
+      </defs>
+      <circle class="im-c" cx="50" cy="50" r="47.4"/>
+      <path class="im-r" d="M66 8.5 Q69.9 43.77 92 50 Q69.9 56.23 66 91.5 Q59.5 60.38 40 50 Q59.5 39.63 66 8.5Z" fill="url(#ig-r)"/>
+      <path class="im-l" d="M34 8.5 Q40.5 39.63 60 50 Q40.5 60.38 34 91.5 Q30.1 56.23 8 50 Q30.1 43.77 34 8.5Z" fill="url(#ig-l)"/>
+    </svg>
+    <p class="kicker hero-in" data-i18n="hero.kicker">Una app per a Android · Gratis</p>
+    <h1 id="hero-title" class="hero-title hero-in" data-i18n="hero.h1b">La dopamina falsa et mata.</h1>
+    <p class="hero-p hero-in" data-i18n="hero.p">Una pausa abans del scroll.</p>
+    <div class="hero-actions hero-in">
       <a class="btn" href="#prova" data-magnetic data-i18n="hero.cta">Prova-la a Android</a>
       <a class="text-link" href="#com-funciona" data-i18n="hero.link">Mira com funciona</a>
     </div>
   </div>
-
-  <div class="stage" data-stage>
-    <div class="phone hero-phone" id="demo" data-tilt>
-      <div class="phone-screen">
-        <div class="island" aria-hidden="true"></div>
-        <video class="real-video" data-video="loop" src="media/hero.mp4" poster="media/hero.jpg" width="480" height="1040" muted loop playsinline preload="auto" aria-hidden="true"></video>
-      </div>
-    </div>
-  </div>
-
-  <a class="scroll-cue" href="#say" aria-hidden="true" tabindex="-1"><span data-i18n="hero.scroll">Baixa</span><i></i></a>
+  <a class="scroll-cue hero-in" href="#say" aria-hidden="true" tabindex="-1"><span data-i18n="hero.scroll">Baixa</span><i></i></a>
 </section>
 
 <!-- 2. La frase que s'il·lumina paraula a paraula -->
@@ -113,84 +98,72 @@
   </div>
 </section>
 
-<!-- 5. Com funciona: totes les funcions, dins de l'app de veritat -->
+<!-- 5. Funcions: un bloc per cada cosa que fa l'app, amb el mòbil de veritat -->
 <section class="how" id="com-funciona" aria-labelledby="how-title">
   <div class="how-head">
-    <p class="kicker" data-i18n="how.k">Pas a pas</p>
-    <h2 id="how-title" class="h2" data-split data-i18n="how.h">Com funciona</h2>
+    <p class="kicker" data-i18n="how.k">Tot el que fa</p>
+    <h2 id="how-title" class="h2" data-split data-i18n="how.h">Funcions de scrolloff</h2>
   </div>
-  <div class="feats">
-    <article class="feat">
-      <div class="feat-phone" data-reveal>
-        <div class="phone"><div class="phone-screen"><div class="island" aria-hidden="true"></div>
-          <video class="real-video" data-video="loop" src="media/how-1.mp4" poster="media/how-1.jpg" width="480" height="1040" muted loop playsinline preload="metadata" aria-hidden="true"></video>
-        </div></div>
+  <div class="fns">
+    <article class="fn" data-reveal>
+      <div class="fn-copy">
+        <span class="fn-n">01</span>
+        <h3 class="fn-h" data-i18n="fn.1">Funció 1</h3>
+        <p class="fn-p" data-i18n="how.1t"></p>
       </div>
-      <div class="feat-copy" data-reveal>
-        <span class="step-n">01</span>
-        <h3 class="step-h" data-i18n="how.1">Primer, tries quines apps et roben temps.</h3>
-        <p class="feat-p" data-i18n="how.1t">A la llista només hi surten les apps que tu vols protegir. Les altres no les toca.</p>
-      </div>
+      <div class="fn-phone"><div class="phone"><div class="phone-screen"><div class="island" aria-hidden="true"></div>
+        <video class="real-video" data-video="loop" src="media/how-1.mp4" poster="media/how-1.jpg" width="480" height="1040" muted loop playsinline preload="metadata" aria-hidden="true"></video>
+      </div></div></div>
     </article>
-    <article class="feat">
-      <div class="feat-phone" data-reveal>
-        <div class="phone"><div class="phone-screen"><div class="island" aria-hidden="true"></div>
-          <video class="real-video" data-video="loop" src="media/how-2.mp4" poster="media/how-2.jpg" width="480" height="1040" muted loop playsinline preload="metadata" aria-hidden="true"></video>
-        </div></div>
+    <article class="fn" data-reveal>
+      <div class="fn-copy">
+        <span class="fn-n">02</span>
+        <h3 class="fn-h" data-i18n="fn.2">Funció 2</h3>
+        <p class="fn-p" data-i18n="how.2t"></p>
       </div>
-      <div class="feat-copy" data-reveal>
-        <span class="step-n">02</span>
-        <h3 class="step-h" data-i18n="how.2">Després, obres TikTok sense pensar-hi.</h3>
-        <p class="feat-p" data-i18n="how.2t">Abans que s’obri, ScrollOff t’atura 8 segons: respires i et pregunta si de veritat hi vols entrar.</p>
-      </div>
+      <div class="fn-phone"><div class="phone"><div class="phone-screen"><div class="island" aria-hidden="true"></div>
+        <video class="real-video" data-video="loop" src="media/how-2.mp4" poster="media/how-2.jpg" width="480" height="1040" muted loop playsinline preload="metadata" aria-hidden="true"></video>
+      </div></div></div>
     </article>
-    <article class="feat">
-      <div class="feat-phone" data-reveal>
-        <div class="phone"><div class="phone-screen"><div class="island" aria-hidden="true"></div>
-          <video class="real-video" data-video="loop" src="media/how-3.mp4" poster="media/how-3.jpg" width="480" height="1040" muted loop playsinline preload="metadata" aria-hidden="true"></video>
-        </div></div>
+    <article class="fn" data-reveal>
+      <div class="fn-copy">
+        <span class="fn-n">03</span>
+        <h3 class="fn-h" data-i18n="fn.3">Funció 3</h3>
+        <p class="fn-p" data-i18n="how.3t"></p>
       </div>
-      <div class="feat-copy" data-reveal>
-        <span class="step-n">03</span>
-        <h3 class="step-h" data-i18n="how.3">I llavors decideixes tu.</h3>
-        <p class="feat-p" data-i18n="how.3t">Tanques i continues amb el teu dia, o entres igualment. Sempre ho decideixes tu.</p>
-      </div>
+      <div class="fn-phone"><div class="phone"><div class="phone-screen"><div class="island" aria-hidden="true"></div>
+        <video class="real-video" data-video="loop" src="media/how-3.mp4" poster="media/how-3.jpg" width="480" height="1040" muted loop playsinline preload="metadata" aria-hidden="true"></video>
+      </div></div></div>
     </article>
-    <article class="feat">
-      <div class="feat-phone" data-reveal>
-        <div class="phone"><div class="phone-screen"><div class="island" aria-hidden="true"></div>
-          <video class="real-video" data-video="loop" src="media/how-4.mp4" poster="media/how-4.jpg" width="480" height="1040" muted loop playsinline preload="metadata" aria-hidden="true"></video>
-        </div></div>
+    <article class="fn" data-reveal>
+      <div class="fn-copy">
+        <span class="fn-n">04</span>
+        <h3 class="fn-h" data-i18n="fn.4">Funció 4</h3>
+        <p class="fn-p" data-i18n="how.4t"></p>
       </div>
-      <div class="feat-copy" data-reveal>
-        <span class="step-n">04</span>
-        <h3 class="step-h" data-i18n="how.4">Quan t’has de concentrar, un toc.</h3>
-        <p class="feat-p" data-i18n="how.4t">El mode Focus bloqueja les apps durant 25, 50 o 90 minuts.</p>
-      </div>
+      <div class="fn-phone"><div class="phone"><div class="phone-screen"><div class="island" aria-hidden="true"></div>
+        <video class="real-video" data-video="loop" src="media/how-4.mp4" poster="media/how-4.jpg" width="480" height="1040" muted loop playsinline preload="metadata" aria-hidden="true"></video>
+      </div></div></div>
     </article>
-    <article class="feat">
-      <div class="feat-phone" data-reveal>
-        <div class="phone"><div class="phone-screen"><div class="island" aria-hidden="true"></div>
-          <video class="real-video" data-video="loop" src="media/how-5.mp4" poster="media/how-5.jpg" width="480" height="1040" muted loop playsinline preload="metadata" aria-hidden="true"></video>
-        </div></div>
+    <article class="fn" data-reveal>
+      <div class="fn-copy">
+        <span class="fn-n">05</span>
+        <h3 class="fn-h" data-i18n="fn.5">Funció 5</h3>
+        <p class="fn-p" data-i18n="how.5t"></p>
       </div>
-      <div class="feat-copy" data-reveal>
-        <span class="step-n">05</span>
-        <h3 class="step-h" data-i18n="how.5">Rutines i reptes amb amics.</h3>
-        <p class="feat-p" data-i18n="how.5t">Programa horaris perquè les apps es protegeixin soles, i competeix amb la teva gent per veure qui fa servir menys el mòbil.</p>
-      </div>
+      <div class="fn-phone"><div class="phone"><div class="phone-screen"><div class="island" aria-hidden="true"></div>
+        <video class="real-video" data-video="loop" src="media/how-5.mp4" poster="media/how-5.jpg" width="480" height="1040" muted loop playsinline preload="metadata" aria-hidden="true"></video>
+      </div></div></div>
     </article>
-    <article class="feat">
-      <div class="feat-phone" data-reveal>
-        <div class="phone"><div class="phone-screen"><div class="island" aria-hidden="true"></div>
-          <video class="real-video" data-video="loop" src="media/how-6.mp4" poster="media/how-6.jpg" width="480" height="1040" muted loop playsinline preload="metadata" aria-hidden="true"></video>
-        </div></div>
+    <article class="fn" data-reveal>
+      <div class="fn-copy">
+        <span class="fn-n">06</span>
+        <h3 class="fn-h" data-i18n="fn.6">Funció 6</h3>
+        <p class="fn-p" data-i18n="how.6t"></p>
       </div>
-      <div class="feat-copy" data-reveal>
-        <span class="step-n">06</span>
-        <h3 class="step-h" data-i18n="how.6">I veus com vas millorant.</h3>
-        <p class="feat-p" data-i18n="how.6t">Assoliments, ratxes i un resum de la teva setmana.</p>
-      </div>
+      <div class="fn-phone"><div class="phone"><div class="phone-screen"><div class="island" aria-hidden="true"></div>
+        <video class="real-video" data-video="loop" src="media/how-6.mp4" poster="media/how-6.jpg" width="480" height="1040" muted loop playsinline preload="metadata" aria-hidden="true"></video>
+      </div></div></div>
     </article>
   </div>
 </section>
@@ -236,13 +209,15 @@
 </main>
 
 <footer class="foot-min">
-  <span class="foot-word" aria-hidden="true">scroll<b>off</b></span>
-  <nav aria-label="Peu">
-    <a href="privacitat.html" data-i18n="foot.privacy">Política de privacitat</a>
-    <a href="mailto:danielmeller@gmail.com">danielmeller@gmail.com</a>
-    <a href="mailto:david.meller.e@gmail.com">david.meller.e@gmail.com</a>
-  </nav>
-  <span class="legal">© 2026 David Meller</span>
+  <p class="foot-big" aria-label="scrolloff"><span aria-hidden="true"><b>scro</b><i>ll</i>off</span></p>
+  <div class="foot-row">
+    <nav aria-label="Peu">
+      <a href="privacitat.html" data-i18n="foot.privacy">Política de privacitat</a>
+      <a href="mailto:danielmeller@gmail.com">danielmeller@gmail.com</a>
+      <a href="mailto:david.meller.e@gmail.com">david.meller.e@gmail.com</a>
+    </nav>
+    <span class="legal">© 2026 David Meller</span>
+  </div>
 </footer>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
