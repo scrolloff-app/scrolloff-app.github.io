@@ -5,7 +5,7 @@
   --surface-2: #202023;
   --line: #2A2A2E;
   --ink: #F4F3EF;
-  --muted: #A9A69D;
+  --muted: #C6C2B8;
   --accent: #E0AC26;
   --gold-grad: linear-gradient(135deg, #FFEDB3 0%, #EDBE45 45%, #C98F26 100%);
   --on-accent: #0B0B0C;
@@ -415,7 +415,7 @@ button { cursor: pointer; }
 .cta { margin-top: var(--gap-section); min-height: 100svh; background: var(--gold-grad); color: var(--on-accent); display: grid; grid-template-columns: 6fr 5fr; gap: 40px; padding: 120px var(--margin) 80px; align-items: center; }
 .cta-title { font-size: clamp(64px, 11vw, 200px); line-height: .86; font-weight: 900; letter-spacing: -0.06em; }
 .cta-copy > p { margin-top: 28px; font-size: 19px; max-width: 40ch; color: #2B2310; }
-.dialog { justify-self: end; width: min(460px, 100%); background: #FAFAF8; color: #151515; border-radius: 28px; padding: 32px; box-shadow: 0 30px 60px rgba(60,40,0,.25); }
+.dialog { justify-self: end; width: min(460px, 100%); background: #FAFAF8; color: #151515; border-radius: 28px; padding: 32px; box-shadow: 0 30px 60px rgba(0,0,0,.18); }
 .dialog-body { display: grid; gap: 14px; }
 .dialog-title { font-size: 24px; font-weight: 900; letter-spacing: -0.02em; }
 .dialog label { font-size: 13px; font-weight: 700; color: #444; margin-top: 4px; }
@@ -635,8 +635,9 @@ button { cursor: pointer; }
 .fx-d { padding: 0 0 clamp(20px, 3vh, 32px) 46px; font-size: clamp(17px, 1.5vw, 21px); line-height: 1.5; color: var(--muted); max-width: 40ch; }
 .fx-stage { display: grid; place-items: center; position: sticky; top: 90px; align-self: start; }
 .fx-stage .phone { width: min(310px, 70vw); }
-.fx-stage .real-video { opacity: 0; transition: opacity .55s var(--ease-out); }
-.fx-stage .real-video.on { opacity: 1; }
+.fx-stage .real-video, .fx-stage .real-shot { opacity: 0; transition: opacity .55s var(--ease-out); }
+.fx-stage .real-video.on, .fx-stage .real-shot.on { opacity: 1; }
+.real-shot { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; background: #000; }
 .phone { transition: transform .6s var(--ease-out); }
 
 @media (max-width: 860px) {
@@ -645,6 +646,26 @@ button { cursor: pointer; }
   .fx-stage .phone { width: min(230px, 62vw); }
   .fx-d { padding-left: 0; }
   .fx-item { grid-template-columns: 30px 1fr auto; }
+}
+
+/* ============ Disponibilitat i captures de la nova app ============ */
+.store-status { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; padding: 0 var(--margin); }
+.store-status p { margin: 0; padding: 12px 18px; border: 1px solid var(--line); border-radius: 999px; color: var(--ink); font-weight: 700; font-size: 15px; }
+.screens { margin-top: var(--gap-section); padding: 0 var(--margin); }
+.screens-head { max-width: 58ch; margin: 0 auto clamp(34px, 6vw, 72px); text-align: center; }
+.screens-head .h2 { max-width: 12ch; margin: 8px auto 18px; text-wrap: balance; }
+.screens-head > p:last-child { color: var(--muted); font-size: 18px; line-height: 1.5; }
+.feature-graphic { display: block; width: min(100%, 1024px); height: auto; margin: 0 auto clamp(48px, 8vw, 110px); border-radius: 20px; }
+.screen-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); align-items: end; gap: clamp(12px, 2vw, 28px); max-width: 1120px; margin: 0 auto; }
+.screen-grid figure { margin: 0; overflow: hidden; border-radius: clamp(18px, 2vw, 28px); background: #111; }
+.screen-grid img { display: block; width: 100%; height: auto; }
+@media (max-width: 860px) {
+  .store-status { justify-content: flex-start; }
+  .store-status p { width: 100%; text-align: center; }
+  .screen-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+  .screens-head { text-align: left; margin-inline: 0; }
+  .screens-head .h2 { margin-inline: 0; }
+  .feature-graphic { border-radius: 12px; }
 }
 
 /* ============ Peu: scrolloff gegant ============ */

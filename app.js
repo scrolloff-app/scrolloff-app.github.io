@@ -60,6 +60,10 @@
         if (typeof v === 'string') el.setAttribute(attr, v);
       });
     });
+    $$('[data-i18n-alt]').forEach((el) => {
+      const v = t(el.dataset.i18nAlt);
+      if (typeof v === 'string') el.alt = v;
+    });
     $$('[data-split], [data-scrub]').forEach(split);
     $$('[data-lang]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.lang === lang)));
     listeners.forEach((fn) => fn());
@@ -145,12 +149,13 @@
   });
 
   // ---------- Funcions: títols en llista; en clicar-ne un s'obre el detall i el seu vídeo ----------
-  const fxRows = $$('.fx-row'), fxVids = $$('[data-fxv]'), fxStage = $('.fx-stage');
+  const fxRows = $$('.fx-row'), fxMedia = $$('[data-fxv]'), fxStage = $('.fx-stage');
   let fxVisible = false;
   function fxSelect(i) {
     fxRows.forEach((r, k) => { r.classList.toggle('open', k === i); $('.fx-item', r).setAttribute('aria-expanded', String(k === i)); });
-    fxVids.forEach((v, k) => {
+    fxMedia.forEach((v, k) => {
       v.classList.toggle('on', k === i);
+      if (!(v instanceof HTMLVideoElement)) return;
       if (k === i) { v.currentTime = 0; if (fxVisible && !reduce) v.play().catch(() => {}); } else v.pause();
     });
     if (motion) setTimeout(() => ScrollTrigger.refresh(), 650);
