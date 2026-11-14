@@ -165,7 +165,7 @@
     new IntersectionObserver((es) => es.forEach((e) => {
       fxVisible = e.isIntersecting;
       const v = $('[data-fxv].on');
-      if (v && !reduce) { if (fxVisible) v.play().catch(() => {}); else v.pause(); }
+      if (v && !reduce && v instanceof HTMLVideoElement) { if (fxVisible) v.play().catch(() => {}); else v.pause(); }
     }), { threshold: 0.25 }).observe(fxStage);
   }
 
