@@ -76,6 +76,18 @@
     if (motion) { buildScrub(); ScrollTrigger.refresh(); }
   }));
 
+  // iPhone invitation is shown once on this device. If storage is blocked, stay quiet.
+  const invitation = $('[data-install-invite]');
+  $('[data-install-dismiss]')?.addEventListener('click', () => { invitation.hidden = true; });
+  whenIntroEnds(() => {
+    if (!invitation || !/iPhone/i.test(navigator.userAgent) || navigator.standalone || matchMedia('(display-mode: standalone)').matches) return;
+    try {
+      if (localStorage.getItem('scrolloff.install.seen')) return;
+      localStorage.setItem('scrolloff.install.seen', '1');
+    } catch (_) { return; }
+    invitation.hidden = false;
+  });
+
   // ---------- Vídeos reals de l'app: s'ajusten sols quan es veuen ----------
   $$('video[data-video="loop"]').forEach((v) => {
     v.muted = true;
@@ -84,21 +96,6 @@
       new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) v.play().catch(() => {}); else v.pause(); }), { threshold: 0.25 }).observe(v);
     } else v.play().catch(() => {});
   });
-
-  // ---------- Dades: els números pugen quan es veuen ----------
-  function countUp(el) {
-    if (reduce || el.dataset.counted) return;
-    el.dataset.counted = '1';
-    const txt = el.textContent, m = txt.match(/\d+/);
-    if (!m) return;
-    const target = Number(m[0]), t0 = performance.now();
-    const step = (now) => {
-      const p = Math.min(1, (now - t0) / 1300), v = Math.round(target * (1 - Math.pow(1 - p, 3)));
-      el.textContent = txt.replace(m[0], String(v));
-      if (p < 1) requestAnimationFrame(step); else el.textContent = t(el.dataset.i18n);
-    };
-    requestAnimationFrame(step);
-  }
 
   // ---------- Paraules en moviment ----------
   const rows = $$('[data-marquee]');
@@ -117,10 +114,8 @@
   // de dades no deixen llegir res i limiten els enviaments.
   const SB_URL = 'https://qaijwaowtenjuuxqabtq.supabase.co/rest/v1/feedback';
   const SB_KEY = 'sb_publishable_awxkvjC9sHhdO739ash_Sw_CfmD8nmB';
-  const form = $('[data-join]'), segOs = $('[data-seg-os]'), msg = $('[data-join-msg]'), sendBtn = $('[data-join-btn]');
-  let os = 'Android';
-  const radio = (group, val) => $$('button', group).forEach((b) => b.setAttribute('aria-checked', String(b.dataset.v === String(val))));
-  $$('button', segOs).forEach((b) => b.addEventListener('click', () => { os = b.dataset.v; radio(segOs, os); }));
+  const form = $('[data-join]'), msg = $('[data-join-msg]'), sendBtn = $('[data-join-btn]');
+  const os = 'Android';
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
     const input = $('#join-email');
@@ -190,10 +185,6 @@
   if (!motion) {
     $$('.tl').forEach((li) => li.classList.add('on'));
     $('[data-timeline]').style.setProperty('--p', '1');
-    if ('IntersectionObserver' in window) {
-      const ob = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) countUp(e.target); }), { threshold: 0.4 });
-      $$('[data-count]').forEach((el) => ob.observe(el));
-    }
     return;
   }
 
@@ -253,17 +244,22 @@
 
   // --- 3. Dades: la línia s'omple mentre baixes i cada cercle s'encén amb la seva dada ---
   const tlEl = $('[data-timeline]'), dots = $$('.tl', tlEl);
-  ScrollTrigger.create({
-    trigger: tlEl, start: 'top 78%', end: 'bottom 62%', scrub: 0.5,
-    onUpdate: (self) => {
-      tlEl.style.setProperty('--p', self.progress.toFixed(3));
-      dots.forEach((li, i) => {
-        const on = self.progress >= i / dots.length + 0.02;
-        if (on && !li.classList.contains('on')) { li.classList.add('on'); countUp($('[data-count]', li)); }
-        else if (!on && li.classList.contains('on')) li.classList.remove('on');
-      });
-    },
-  });
+  const lineState = { progress: 0 };
+  const paintTimeline = () => {
+    tlEl.style.setProperty('--p', lineState.progress.toFixed(4));
+    const length = tlEl.offsetHeight;
+    dots.forEach((li) => {
+      const marker = $('.tl-dot', li);
+      const dotPosition = (li.offsetTop + marker.offsetTop + marker.offsetHeight / 2) / length;
+      const on = lineState.progress >= dotPosition;
+      const reveal = Math.min(1, Math.max(0, (lineState.progress - dotPosition) * length / 100));
+      li.style.setProperty('--reveal', reveal.toFixed(3));
+      li.classList.toggle('on', on);
+    });
+  };
+  gsap.to(lineState, { progress: 1, ease: 'none', onUpdate: paintTimeline,
+    scrollTrigger: { trigger: tlEl, start: 'top 72%', end: 'bottom 72%', scrub: 0.45,
+      invalidateOnRefresh: true, onRefresh: paintTimeline } });
 
   // --- 5. Paraules en moviment: més ràpid com més ràpid fas scroll ---
   let vel = 0;

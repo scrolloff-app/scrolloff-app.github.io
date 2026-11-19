@@ -594,24 +594,21 @@ button { cursor: pointer; }
 .data-wrap { padding: 0 var(--margin); }
 .data-head { text-align: center; }
 .data-head .h2 { max-width: 14ch; margin-inline: auto; text-wrap: balance; }
-.timeline { --p: 0; position: relative; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: clamp(20px, 3vw, 48px); margin-top: clamp(48px, 8vh, 96px); }
-.timeline::before, .timeline::after { content: ""; position: absolute; left: 0; right: 0; top: 10px; height: 2px; background: var(--line); }
-.timeline::after { background: var(--gold-grad); transform: scaleX(var(--p)); transform-origin: 0 50%; }
-.tl { position: relative; padding-top: 52px; display: grid; gap: 14px; align-content: start; }
-.tl-dot { position: absolute; left: 0; top: 0; z-index: 1; width: 22px; height: 22px; border-radius: 50%; background: var(--bg); border: 2px solid var(--line); transition: background .5s var(--ease-out), border-color .5s, box-shadow .6s, transform .6s var(--ease-spring); }
-.tl.on .tl-dot { background: var(--gold-grad); border-color: transparent; box-shadow: 0 0 0 7px rgba(237,190,69,.14), 0 0 28px rgba(237,190,69,.45); transform: scale(1.12); }
-.tl .stat-n { font-size: clamp(44px, 5.6vw, 96px); font-weight: 900; line-height: .92; letter-spacing: -0.055em; background: var(--gold-grad); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent; font-variant-numeric: tabular-nums; }
-.tl .stat-t { font-size: clamp(17px, 1.5vw, 21px); line-height: 1.4; font-weight: 600; max-width: 24ch; }
-.tl .stat-s { font-size: 14px; color: var(--muted); text-underline-offset: 4px; text-decoration-color: rgba(169,166,157,.4); }
-.tl:not(.on) .stat-n, .tl:not(.on) .stat-t, .tl:not(.on) .stat-s { opacity: .5; }
-.tl .stat-n, .tl .stat-t, .tl .stat-s { transition: opacity .7s var(--ease-out); }
-
+.timeline { --p: 1; position: relative; display: flex; flex-direction: column; gap: 64px; width: min(900px, 100%); margin: 72px auto 0; padding: 0 0 0 44px; }
+.timeline::before, .timeline::after { content: ""; position: absolute; left: 10px; top: 0; bottom: 0; width: 2px; background: var(--line); }
+.timeline::after { background: var(--gold-grad); transform: scaleY(var(--p)); transform-origin: 50% 0; }
+.tl { --reveal: 1; position: relative; display: grid; grid-template-columns: minmax(180px, .8fr) minmax(0, 1fr); column-gap: 32px; row-gap: 16px; align-items: start; min-height: 190px; padding: 0 0 32px; }
+.tl-dot { position: absolute; left: -44px; top: 6px; z-index: 1; width: 22px; height: 22px; border-radius: 50%; background: var(--bg); border: 2px solid var(--line); }
+.tl.on .tl-dot, .no-js .tl-dot { background: var(--accent); border-color: var(--accent); }
+.tl .stat-n { grid-column: 1; grid-row: 1 / 3; font-size: clamp(46px, 6vw, 80px); font-weight: 700; line-height: 1; letter-spacing: -.04em; color: var(--accent); font-variant-numeric: tabular-nums; }
+.tl .stat-t { grid-column: 2; font-size: clamp(19px, 2vw, 25px); line-height: 1.4; font-weight: 400; max-width: 32ch; }
+.tl .stat-s { grid-column: 2; font-size: 14px; color: var(--muted); text-underline-offset: 4px; text-decoration-color: rgba(169,166,157,.4); }
+.tl .stat-n, .tl .stat-t, .tl .stat-s { opacity: calc(.2 + .8 * var(--reveal)); transform: translateY(calc(12px - 12px * var(--reveal))); }
 @media (max-width: 860px) {
-  .timeline { grid-template-columns: 1fr; gap: 44px; padding-left: 8px; }
-  .timeline::before, .timeline::after { left: 10px; right: auto; top: 0; bottom: 0; width: 2px; height: auto; }
-  .timeline::after { transform: scaleY(var(--p)); transform-origin: 50% 0; }
-  .tl { padding: 0 0 0 52px; }
-  .tl-dot { top: 6px; left: 0; }
+  .timeline { margin-top: 48px; padding-left: 40px; gap: 56px; }
+  .tl { display: grid; grid-template-columns: 1fr; gap: 16px; min-height: 240px; }
+  .tl .stat-n, .tl .stat-t, .tl .stat-s { grid-column: 1; grid-row: auto; }
+  .tl-dot { left: -40px; }
 }
 
 /* ============ Funcions: llista de títols; en clicar-ne un s'obre el detall i el seu mòbil ============ */
@@ -656,13 +653,9 @@ button { cursor: pointer; }
 .screens-head .h2 { max-width: 12ch; margin: 8px auto 18px; text-wrap: balance; }
 .screens-head > p:last-child { color: var(--muted); font-size: 18px; line-height: 1.5; }
 .feature-graphic { display: block; width: min(100%, 1024px); height: auto; margin: 0 auto clamp(48px, 8vw, 110px); border-radius: 20px; }
-.screen-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); align-items: end; gap: clamp(12px, 2vw, 28px); max-width: 1120px; margin: 0 auto; }
-.screen-grid figure { margin: 0; overflow: hidden; border-radius: clamp(18px, 2vw, 28px); background: #111; }
-.screen-grid img { display: block; width: 100%; height: auto; }
 @media (max-width: 860px) {
   .store-status { justify-content: flex-start; }
   .store-status p { width: 100%; text-align: center; }
-  .screen-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
   .screens-head { text-align: left; margin-inline: 0; }
   .screens-head .h2 { margin-inline: 0; }
   .feature-graphic { border-radius: 12px; }
@@ -685,22 +678,66 @@ button { cursor: pointer; }
 
 /* ============ Funcions: targetes amb degradat daurat (com a l'app), sense +/-, mòbil girat cap a l'esquerra ============ */
 .fx-list { border-bottom: 0; display: grid; gap: 14px; }
-.fx-row { border: 1px solid rgba(237,190,69,.16); border-radius: 24px; padding: 0 26px; background: linear-gradient(135deg, rgba(237,190,69,.11) 0%, rgba(237,190,69,.025) 58%), #111113; transition: border-color .5s var(--ease-out), background .5s var(--ease-out), box-shadow .5s var(--ease-out), transform .5s var(--ease-out); }
+.fx-row { border-radius: 24px; padding: 0 26px; transition: transform .35s var(--ease-out); }
 .fx-row:hover { border-color: rgba(237,190,69,.34); transform: translateX(4px); }
-.fx-row.open { border-color: rgba(237,190,69,.5); background: linear-gradient(135deg, rgba(237,190,69,.26) 0%, rgba(237,190,69,.05) 62%), #151517; box-shadow: 0 24px 50px -30px rgba(0,0,0,.8); }
+.fx-row.open { --rim: linear-gradient(135deg, #F2D685, #B58A38 50%, #E4BF67); }
 .fx-item { grid-template-columns: 34px 1fr; cursor: pointer; }
 .fx-d { padding-left: 46px; }
 .fx-stage { perspective: 1800px; }
 .fx-phone { transform: rotateY(20deg) rotateX(3deg) rotateZ(-1.5deg); box-shadow: inset 0 0 0 1.5px #3A3A3F, -40px 60px 90px -20px rgba(0,0,0,.8); }
 .fx-stage .real-shot, .fx-stage .real-video { object-fit: cover; image-rendering: auto; }
 
-/* Tira de mòbils: també girats, amb la mateixa vora */
-.screen-grid { perspective: 1600px; }
-.screen-grid figure { background: #000; border: 1.5px solid #3A3A3F; border-radius: clamp(22px, 2.4vw, 34px); transform: rotateY(18deg) rotateZ(-1deg); box-shadow: -26px 36px 60px -26px rgba(0,0,0,.85); transition: transform .6s var(--ease-out); }
-.screen-grid figure:nth-child(even) { margin-top: 28px; }
-.screen-grid figure:hover { transform: rotateY(6deg) translateY(-6px); }
+/* The shared phone treatment also applies to the screenshot composition. */
 @media (max-width: 860px) {
   .fx-row { padding: 0 20px; }
   .fx-phone { transform: rotateY(14deg) rotateX(2deg); }
-  .screen-grid figure { transform: rotateY(12deg); }
+}
+
+/* Neutral granite, with gold confined to the one-pixel rim. */
+:root {
+  --granite: linear-gradient(140deg, #2A2A2E 0%, #1C1C1F 58%, #242427 100%);
+  --rim: linear-gradient(135deg, #CFAE58, #6D5427 45%, #A5843E 78%, #D9BC72);
+  --neutral-shadow: 0 18px 44px -24px rgba(0,0,0,.7);
+}
+.fx-row, .dialog, .store-status p, .screens-composition, .phone, .capture-frame, .chip {
+  border: 1px solid transparent;
+  background: var(--granite) padding-box, var(--rim) border-box;
+  box-shadow: var(--neutral-shadow);
+}
+.fx-row.open { background: var(--granite) padding-box, var(--rim) border-box; }
+.fx-row:hover { transform: translateX(3px); }
+.fx-phone { box-shadow: 0 30px 55px -24px rgba(0,0,0,.8); }
+.dialog input[type=email] { border-radius: 999px; background: #17171A; }
+.platform-note { color: var(--muted); font-size: 15px; font-weight: 400; }
+.cta-download { margin-top: 28px; }
+
+/* Four real screens form one scene, rather than four image tiles. */
+.screens-composition { position: relative; isolation: isolate; max-width: 1100px; height: clamp(580px, 62vw, 750px); margin-inline: auto; border-radius: 40px; overflow: clip; perspective: 1600px; }
+.capture-frame { position: absolute; width: 22%; margin: 0; padding: 5px; border-radius: 36px; overflow: hidden; transform-style: preserve-3d; box-shadow: 0 28px 38px -16px rgba(0,0,0,.6); }
+.capture-frame img { width: 100%; height: auto; border-radius: 30px; }
+.capture-frame:nth-child(1) { left: 4%; top: 18%; transform: rotate(-10deg) rotateY(8deg); z-index: 2; }
+.capture-frame:nth-child(2) { left: 27%; top: 5%; transform: rotate(-4deg) rotateY(5deg); z-index: 3; }
+.capture-frame:nth-child(3) { left: 49%; top: 22%; transform: rotate(5deg) rotateY(-5deg); z-index: 4; }
+.capture-frame:nth-child(4) { left: 70%; top: 12%; transform: rotate(11deg) rotateY(-8deg); z-index: 1; }
+
+.install-invite { position: fixed; z-index: 35; bottom: max(16px, env(safe-area-inset-bottom)); right: 16px; width: min(350px, calc(100% - 32px)); padding: 18px 52px 18px 20px; border: 1px solid transparent; border-radius: 24px; background: var(--granite) padding-box, var(--rim) border-box; box-shadow: 0 12px 40px rgba(0,0,0,.35); }
+.install-title { font-size: 15px; font-weight: 400; margin-bottom: 6px; color: var(--muted); }
+.install-invite .text-link { font-size: 16px; font-weight: 600; }
+.install-dismiss { position: absolute; top: 5px; right: 5px; width: 44px; height: 44px; border: 0; background: transparent; border-radius: 50%; color: var(--muted); font-size: 26px; font-weight: 300; }
+.install-dismiss:hover { color: var(--ink); }
+
+@media (max-width: 860px) {
+  .screens-composition { height: 1100px; border-radius: 32px; }
+  .capture-frame { width: 52%; padding: 4px; border-radius: 28px; }
+  .capture-frame img { border-radius: 23px; }
+  .capture-frame:nth-child(1) { left: 10%; top: 4%; transform: rotate(-7deg); }
+  .capture-frame:nth-child(2) { left: auto; right: 8%; top: 18%; transform: rotate(7deg); }
+  .capture-frame:nth-child(3) { left: 10%; top: 48%; transform: rotate(-7deg); }
+  .capture-frame:nth-child(4) { left: auto; right: 8%; top: 62%; transform: rotate(7deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .timeline { --p: 1 !important; }
+  .tl { --reveal: 1 !important; }
+  .tl-dot { border-color: var(--accent); background: var(--accent); }
+  .tl .stat-n, .tl .stat-t, .tl .stat-s { opacity: 1; transform: none; }
 }
