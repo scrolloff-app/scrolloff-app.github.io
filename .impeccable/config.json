@@ -1,0 +1,35 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "cramped-padding",
+        "value": "*",
+        "files": [
+          "index.html"
+        ],
+        "createdAt": "2026-11-19T18:01:17.885Z",
+        "reason": "Codex reviewed: fx-list border-bottom is overridden to 0; fx-row text is inset by fx-item vertical padding 18-28px and row horizontal padding 20-26px. Confirmed in 390px and 1280px captures."
+      },
+      {
+        "rule": "buried-raster",
+        "value": "*",
+        "files": [
+          "index.html"
+        ],
+        "createdAt": "2026-11-19T18:01:17.969Z",
+        "reason": "Codex reviewed: Focus and Routines images are inactive accordion panels, opacity becomes 1 via real-shot.on when selected. Switching verified in browser; images are intentionally mutually exclusive."
+      },
+      {
+        "rule": "overused-font",
+        "value": "open sans",
+        "files": [
+          "index.html"
+        ],
+        "createdAt": "2026-11-19T18:01:18.054Z",
+        "reason": "Codex retained incumbent brand typography within scoped refinement: Open Sans appears only in footer wordmark; body font is Public Sans. This is not an overused primary body font."
+      }
+    ]
+  }
+}
